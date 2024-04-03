@@ -1,17 +1,8 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useUser, loginWithRedirect } from '@auth0/nextjs-auth0/client'
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 const Home = () => {
-  const { user, error, isLoading } = useUser()
-  // const router = useRouter()
-  // if (user) {
-    // router.push('/dashboard'); // Redirect to dashboard if authenticated
-  // }
+  const { user } = useUser()
   return (
     <div className="container">
       <h1>Home</h1>
