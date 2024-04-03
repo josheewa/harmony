@@ -3,7 +3,14 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+          <link rel="icon" href="/favicon.ico" />
+          <meta name="description" content="" />
+          <meta property="og:site_name" content="" />
+          <meta property="og:description" content="" />
+          <meta property="og:title" content="" />
+          {/* <meta http-equiv="Content-Security-Policy" content="connect-src 'ws://localhost:3000';"/> */}
+        </Head>
       <body>
         <Main />
         <NextScript />
