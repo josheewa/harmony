@@ -15,10 +15,9 @@ const Home = ({ roomName }) => {
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
 
-  
   const MESSAGES_SUBSCRIPTION = gql`
     subscription OnNewMessage($roomId: uuid!) {
-      messages(order_by: { timestamp: desc }, where: { room_id: { _eq: $roomId } }) {
+      messages(order_by: { timestamp: asc }, where: { room_id: { _eq: $roomId } }) {
         id
         message_text
         timestamp
@@ -31,31 +30,27 @@ const Home = ({ roomName }) => {
     loading,
     error: subscriptionError,
   } = useSubscription(MESSAGES_SUBSCRIPTION, {
-    // headers: {
-    //   'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-    // },
     variables: {
-      roomId: room_id
+      roomId: room_id,
     },
   })
 
-  // useEffect(()=>{
-
-  // })
-
   useEffect(() => {
-    console.log(room_id)
-    console.log('Data:', data);
-    console.log('Loading:', loading);
-    console.log('Error:', subscriptionError);
-    console.error(subscriptionError)
-    
-    if (!loading && data) {
-      setMessages(data.messages);
-    }
+    const fetchMessages = async () => {
+      if (!loading && data) {
+        const updatedMessages = await Promise.all(
+          data.messages.map(async (message) => {
+            const username = await getUsername(message.user_id);
+            return { ...message, username };
+          })
+        );
+        setMessages(updatedMessages);
+      }
+    };
+  
+    fetchMessages();
   }, [loading, data, subscriptionError, room_id]);
   
-
   let user_id = user?.['harmony/user_uuid']
   let username = user?.['harmony/username']
 
@@ -111,41 +106,6 @@ const Home = ({ roomName }) => {
 
     return hours + ':' + minutes + ' ' + ampm
   }
-
-  // useEffect(() => {
-  //   const fetchMessages = async () => {
-  //     try {
-  //       let updatedMessages = []
-  //       const response = await fetch('https://harmony.hasura.app/api/rest/fetchroommessages', {
-  //         method: 'POST',
-  //         headers: {
-  //           'content-type': 'application/json',
-  //           'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-  //         },
-  //         body: JSON.stringify({ room_id }),
-  //       })
-
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! status: ${response.status}`)
-  //       }
-
-  //       const data = await response.json()
-
-  //       updatedMessages = await Promise.all(
-  //         data.messages.map(async (message) => {
-  //           const username = await getUsername(message.user_id)
-  //           return { ...message, username }
-  //         })
-  //       )
-  //       setMessages(updatedMessages)
-  //     } catch (error) {
-  //       console.error('Error fetching messages:', error)
-  //     }
-  //   }
-
-  //   // ? Fetch on load
-  //   fetchMessages()
-  // }, [room_id])
 
   const getUsername = async (user_id) => {
     try {
@@ -249,72 +209,3 @@ export async function getServerSideProps({ query }) {
     }
   }
 }
-
-// export async function getServerSideProps({ query }) {
-//   const getUsername = async (user_id) => {
-//     try {
-//       const response = await fetch('https://harmony.hasura.app/v1/graphql', {
-//         method: 'POST',
-//         headers: {
-//           'content-type': 'application/json',
-//           'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-//         },
-//         body: JSON.stringify({
-//           query: `
-//                 query {
-//                   users_by_pk(id: "${user_id}") {
-//                     username
-//                   }
-//                 }
-//                 `,
-//         }),
-//       })
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`)
-//       }
-//       const data = await response.json()
-//       return data.data.users_by_pk.username
-//     } catch (error) {
-//       console.error('Error fetching username:', error)
-//     }
-//   }
-//   const { room_id } = query
-//   try {
-//     let updatedMessages = []
-//     const response = await fetch('https://harmony.hasura.app/api/rest/fetchroommessages', {
-//       method: 'POST',
-//       headers: {
-//         'content-type': 'application/json',
-//         'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-//       },
-//       body: JSON.stringify({ room_id }),
-//     })
-
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`)
-//     }
-
-//     const data = await response.json()
-
-//     updatedMessages = await Promise.all(
-//       data.messages.map(async (message) => {
-//         const username = await getUsername(message.user_id)
-//         return { ...message, username }
-//       })
-//     )
-//       console.log(updatedMessages)
-//     return {
-//       props: {
-//         messages: updatedMessages, // Use an empty array if messages is undefined
-//       },
-//     }
-//   } catch (error) {
-//     console.error('Error fetching messages:', error)
-//     return {
-//       props: {
-//         error: 'Failed to fetch messages',
-//         messages: [], // Use an empty array if an error occurs
-//       },
-//     }
-//   }
-// }
