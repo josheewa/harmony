@@ -9,7 +9,6 @@ export default function Document() {
           <meta property="og:site_name" content="" />
           <meta property="og:description" content="" />
           <meta property="og:title" content="" />
-          {/* <meta http-equiv="Content-Security-Policy" content="connect-src 'ws://localhost:3000';"/> */}
         </Head>
       <body>
         <Main />

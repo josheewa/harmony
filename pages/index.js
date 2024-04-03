@@ -15,8 +15,8 @@ const Home = () => {
   return (
     <div className="container">
       <h1>Home</h1>
-      {user && <a href="/api/auth/logout">Logout</a>}
-      {!user && <a href="/api/auth/login">Login</a>}
+      {user && <Link href="/api/auth/logout">Logout</Link>}
+      {!user && <Link href="/api/auth/login">Login</Link>}
     </div>
   )
 }

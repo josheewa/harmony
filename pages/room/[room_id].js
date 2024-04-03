@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useUser } from '@auth0/nextjs-auth0/client'
-
-import { useSubscription, gql } from '@apollo/client'
+import { convertTimestamp, getUsername } from '@/utils/messageDisplayUtils'
+import { useSubscription } from '@apollo/client'
+import { MESSAGES_SUBSCRIPTION } from '@/utils/subscriptions'
+import Loading from '@/components/Loading'
 
 const Home = ({ roomName }) => {
   const { user, error: userError, isLoading } = useUser()
@@ -15,16 +17,7 @@ const Home = ({ roomName }) => {
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
 
-  const MESSAGES_SUBSCRIPTION = gql`
-    subscription OnNewMessage($roomId: uuid!) {
-      messages(order_by: { timestamp: asc }, where: { room_id: { _eq: $roomId } }) {
-        id
-        message_text
-        timestamp
-        user_id
-      }
-    }
-  `
+ 
   const {
     data,
     loading,
@@ -93,48 +86,8 @@ const Home = ({ roomName }) => {
     }
   }
 
-  const convertTimestamp = (timestamp) => {
-    let date = new Date(timestamp)
 
-    let hours = date.getHours()
-    let minutes = date.getMinutes()
-    let ampm = hours >= 12 ? 'PM' : 'AM'
-
-    hours = hours % 12
-    hours = hours ? hours : 12
-    minutes = minutes < 10 ? '0' + minutes : minutes
-
-    return hours + ':' + minutes + ' ' + ampm
-  }
-
-  const getUsername = async (user_id) => {
-    try {
-      const response = await fetch('https://harmony.hasura.app/v1/graphql', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query {
-              users_by_pk(id: "${user_id}") {
-                username
-              }
-            }
-            `,
-        }),
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      return data.data.users_by_pk.username
-    } catch (error) {
-      console.error('Error fetching username:', error)
-    }
-  }
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading || loading) return <Loading/>
   if (userError) return <div>{userError.message}</div>
   if (subscriptionError) {
     console.log(data)
@@ -185,7 +138,6 @@ export default Home
 export async function getServerSideProps({ query }) {
   const { room_id } = query
   try {
-    // Fetch your room name here
     const response = await fetch('https://harmony.hasura.app/api/rest/fetchroomname', {
       method: 'POST',
       headers: {

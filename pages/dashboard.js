@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import Link from 'next/link'
 import Image from 'next/image'
+import Loading from '@/components/Loading'
 
 export default function Dashboard() {
   const { user, error, isLoading } = useUser()
   const [rooms, setRooms] = useState({})
-  // let username = user?.['harmony/username']
 
   const uuid = user?.['harmony/user_uuid']
 
@@ -31,8 +30,8 @@ export default function Dashboard() {
     }
     fetchUserRooms(uuid)
   }, [uuid])
-  // checkUserByEmail(user.email)
-  if (isLoading) return <div>Loading...</div>
+
+  if (isLoading) return <Loading/>
   if (error) return <div>{error.message}</div>
 
   return (
