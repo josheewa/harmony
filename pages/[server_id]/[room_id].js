@@ -4,22 +4,18 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import { convertTimestamp } from '@/utils/functions'
-import { useSubscription, useMutation, useQuery, gql } from '@apollo/client'
+import { useSubscription, useMutation, useQuery } from '@apollo/client'
 import { MESSAGES_SUBSCRIPTION, SEND_MESSAGE, FETCH_ROOM_NAME } from '@/utils/Apollo/queries'
 import Loading from '@/components/Loading'
 
-const Home = () => {
+export default function ChatRoom() {
   const { user, isLoading } = useUser()
   const router = useRouter()
   const { room_id } = router.query
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
 
-  const {
-    loading: roomNameLoading,
-    error: roomNameError,
-    data: roomNameData,
-  } = useQuery(FETCH_ROOM_NAME, {
+  const { loading: roomNameLoading, data: roomNameData } = useQuery(FETCH_ROOM_NAME, {
     variables: { room_id },
   })
 
@@ -47,7 +43,6 @@ const Home = () => {
             return { ...message, username }
           })
         )
-
         setMessages(updatedMessages)
       }
     }
@@ -130,34 +125,4 @@ const Home = () => {
       </main>
     </>
   )
-}
-
-export default Home
-
-export async function getServerSideProps({ query }) {
-  // const [fetchRoomName] = useMutation(FETCH_ROOM_NAME)
-  const { room_id } = query
-  try {
-    const response = await fetch('https://harmony.hasura.app/api/rest/fetchroomname', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
-      },
-      body: JSON.stringify({ room_id }),
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const roomName = (await response.json()).rooms[0].room_name
-    return { props: { roomName } }
-  } catch (error) {
-    console.error(error)
-    return {
-      props: {
-        error: 'Failed to get room name.',
-      },
-    }
-  }
 }

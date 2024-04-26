@@ -35,10 +35,6 @@
   .username {
     @apply mx-2 font-bold;
   }
-  .messages-container {
-    /* max-height: 300px; */
-    /* overflow-y: auto; */
-  }
 
   .message {
     @apply flex flex-row justify-start;
@@ -105,7 +101,7 @@
     border: 1px solid black;
   }
 
-  button {
+  .button {
     /* width: 100%; */
     padding: 10px;
     font-size: 16px;

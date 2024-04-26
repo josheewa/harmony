@@ -7,8 +7,16 @@ import { ApolloClient, HttpLink, InMemoryCache, split, ApolloProvider } from '@a
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
+
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import Head from 'next/head'
 const httpLink = new HttpLink({
   uri: 'https://harmony.hasura.app/v1/graphql',
+  headers: {
+    'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
+    'x-hasura-role': 'admin',
+  },
 })
 
 const wsLink =
@@ -18,6 +26,16 @@ const wsLink =
           url: 'wss://harmony.hasura.app/v1/graphql',
           headers: {
             'x-hasura-admin-secret': `${process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET}`,
+          },
+          on: {
+            closed: () => {
+              console.log('Socket was closed, reconnecting...')
+              if (wsLink && wsLink.subscriptionClient) {
+                wsLink.subscriptionClient.connect()
+              } else {
+                console.log('wsLink or wsLink.subscriptionClient is undefined')
+              }
+            },
           },
         })
       )
@@ -44,12 +62,18 @@ const client = new ApolloClient({
 
 export default function App({ Component, pageProps }) {
   return (
-    <ApolloProvider client={client}>
-      <UserProvider>
-        <LoginCheck>
-          <Component {...pageProps} />
-        </LoginCheck>
-      </UserProvider>
-    </ApolloProvider>
+    <>
+      <Head>
+        <title>Harmony</title>
+      </Head>
+      <ApolloProvider client={client}>
+        <UserProvider>
+          <LoginCheck>
+            <Component {...pageProps} />
+            <ToastContainer />
+          </LoginCheck>
+        </UserProvider>
+      </ApolloProvider>
+    </>
   )
 }
