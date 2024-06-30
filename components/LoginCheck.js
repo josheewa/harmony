@@ -1,23 +1,26 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useUser } from '@auth0/nextjs-auth0/client'
+import Loading from './Loading'
 
 const LoginCheck = ({ children }) => {
-  const { user, isLoading } = useUser();
-  const router = useRouter();
+  const { user, isLoading } = useUser()
+  const router = useRouter()
 
   useEffect(() => {
-    // Wait until useUser finishes loading
     if (!isLoading) {
-      const currentPath = router.pathname;
-
+      const currentPath = router.pathname
       if (currentPath !== '/' && !user) {
-        router.push('/api/auth/login');
+        router.push('/api/auth/login')
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router])
 
-  return !isLoading && <>{children}</>;
-};
+  if (isLoading || !user) {
+    return <Loading />
+  }
 
-export default LoginCheck;
+  return <>{children}</>
+}
+
+export default LoginCheck

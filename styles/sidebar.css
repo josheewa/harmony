@@ -1,0 +1,169 @@
+@tailwind components;
+
+@layer components {
+  .sidebar-container {
+    @apply h-screen w-full flex fixed;
+  }
+  .server-nav-panel {
+    @apply relative w-20 bg-gray-900 flex text-white text-center flex-col items-center justify-start p-3;
+  }
+  .sidebar-server-icon {
+    @apply bg-white rounded-full;
+  }
+  .sidebar-server-icon:hover {
+    @apply rounded-2xl;
+  }
+  .server-nav-item {
+    @apply mb-5;
+  }
+  .sidebar-logout {
+    @apply absolute bottom-0 server-nav-item text-red-500;
+  }
+  .modal {
+    @apply absolute;
+  }
+  .second-nav-panel {
+    @apply w-56 bg-gray-800 text-white text-center overflow-y-auto py-3;
+  }
+  .sidebar-room-name {
+    @apply font-bold text-xl my-5;
+  }
+  .room-link-container {
+    @apply flex flex-row my-2 mx-1;
+  }
+  .sidebar-rooms {
+    @apply bg-gray-700 h-full w-full text-left px-2 py-1 text-gray-200 flex flex-row justify-between;
+  }
+  .room-name {
+    @apply text-gray-200 flex flex-row items-center;
+  }
+  .more-button-container {
+    @apply relative items-center flex bg-gray-100 px-1 text-black;
+  }
+  .more-button-container:hover {
+    @apply bg-gray-500 text-white;
+  }
+  .dropdown-content {
+    @apply z-10 right-0 top-8 w-32 absolute bg-white text-left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  .dropdown-content button {
+    @apply block w-full p-2 border-none bg-transparent cursor-pointer text-black;
+  }
+  .dropdown-content button:hover {
+    @apply bg-gray-200;
+  }
+  .current-room {
+    @apply bg-black;
+  }
+  .user-info-pane {
+    @apply bottom-0 absolute flex flex-row items-center bg-gray-900 w-56 p-3;
+  }
+  .user-info-pfp {
+    @apply rounded-full;
+  }
+  .user-info-pane h2 {
+    @apply mx-5 font-bold;
+  }
+  .user-settings-button {
+    @apply text-gray-200 hover:text-gray-500 cursor-pointer;
+  }
+  .new-room-container {
+    @apply w-full flex flex-row items-center px-3;
+  }
+  .new-room-input {
+    @apply w-fit text-black p-2 outline-none rounded-lg;
+  }
+  .new-room-input::placeholder {
+    @apply text-gray-500;
+  }
+  .cancel-button {
+    @apply mx-2;
+  }
+  .create-room-button {
+    @apply flex w-52 justify-center bg-gray-700 py-2 rounded-full mx-2;
+  }
+  .user-settings-modal {
+    @apply flex justify-center items-center fixed z-20 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50;
+  }
+  .user-settings-title {
+    @apply text-center font-bold text-xl m-2;
+  }
+  .user-settings-description {
+    @apply text-center m-3 underline;
+  }
+  .user-settings-modal-content {
+    @apply bg-white p-5 rounded-xl w-96 max-w-[80%];
+  }
+  .user-settings-close {
+    @apply text-gray-400 float-right text-3xl font-bold;
+  }
+  .user-settings-close:hover,
+  .user-settings-close:focus {
+    @apply text-black cursor-pointer;
+  }
+  .user-settings-modal button {
+    @apply text-white border-none cursor-pointer;
+  }
+  .custom-file-upload {
+    @apply flex justify-center text-center items-center flex-row cursor-pointer py-2 px-3 rounded-md bg-gray-100 border border-gray-300;
+  }
+  .custom-file-upload > * {
+    @apply mx-1;
+  }
+  .upload-container {
+    @apply flex flex-col items-center justify-center;
+  }
+  .link-upload-btn {
+    @apply bg-blue-500;
+  }
+  .link-upload-btn:hover {
+    @apply bg-blue-700;
+  }
+  .profile-pic-upload,
+  .profile-pic-link {
+    @apply mb-5;
+  }
+  .profile-pic-preview {
+    @apply mt-3 text-center p-3;
+  }
+  .profile-pic-preview img {
+    @apply rounded-full h-24 w-24 object-cover;
+  }
+  .pfp-menu-btns {
+    @apply flex flex-row w-full justify-center items-center;
+  }
+  .pfp-menu-btns button {
+    @apply mx-2 h-12 items-center;
+  }
+  .upload-pfp-btn > * {
+    @apply mx-1;
+  }
+  .cancel-upload-pfp-btn {
+    @apply bg-red-500;
+  }
+  .cancel-upload-pfp-btn:hover {
+    @apply bg-red-700;
+  }
+  .upload-pfp-btn {
+    @apply bg-cyan-600 flex flex-row;
+  }
+  .upload-pfp-btn:hover {
+    @apply bg-cyan-800;
+  }
+  .link-container {
+    @apply flex flex-row justify-center;
+  }
+  .link-container input {
+    @apply rounded-xl px-3 border border-black h-10;
+  }
+  .link-container button {
+    @apply h-10 rounded-xl px-2;
+  }
+  .profile-pic-preview img {
+    @apply mt-3 rounded-full;
+  }
+  .upload-container button {
+    @apply p-3 mt-3 rounded-md;
+  }
+}

@@ -1,0 +1,112 @@
+@tailwind components;
+
+@layer components {
+  .chat-header {
+    @apply flex flex-row sticky items-center text-2xl justify-center w-full bg-gray-700 text-white py-6;
+  }
+  .chat-wrapper {
+    @apply flex flex-col h-screen;
+  }
+
+  .room-start-banner {
+    @apply p-5 text-gray-800 border-b-4 border-double border-gray-300;
+  }
+  .room-start-banner h1 {
+    @apply my-2;
+  }
+
+  .messages-container {
+    @apply flex flex-col-reverse overflow-auto justify-start h-full;
+  }
+
+  .date-separator {
+    @apply flex items-center text-center w-full text-gray-400 text-sm my-2;
+  }
+  .date-separator:before,
+  .date-separator:after {
+    @apply flex-1 border-b-gray-400 border-solid border-2;
+    content: '';
+  }
+  .date-separator:before {
+    margin-right: 0.5em;
+  }
+  .date-separator:after {
+    margin-left: 0.5em;
+  }
+
+  .message-group {
+    @apply flex flex-col-reverse;
+  }
+  .message-body {
+    @apply mx-4;
+  }
+  .timestamp {
+    @apply mx-2 text-gray-600;
+  }
+
+  .username {
+    @apply font-bold;
+  }
+  .chat-pfp {
+    @apply rounded-full;
+  }
+
+  .message {
+    @apply flex flex-row justify-start;
+    background-color: #f0f0f0;
+    padding: 8px;
+    margin-bottom: 4px;
+  }
+
+  .input-container {
+    @apply bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1;
+    border: 1px solid #ccc;
+  }
+
+  .input-field {
+    @apply border-none outline-none bg-transparent w-full text-lg p-2 text-white;
+  }
+
+  .input-field::placeholder {
+    @apply text-gray-50;
+  }
+  .send-button {
+    @apply bg-transparent rounded-full px-3 text-gray-50;
+  }
+
+  .send-button:hover {
+    @apply text-gray-800;
+  }
+
+  .message-fail-banner {
+    @apply flex flex-row items-center text-red-500;
+  }
+  .message-fail-banner span {
+    @apply mx-2;
+  }
+  .resend-button {
+    @apply text-black mx-2 border-none flex flex-row bg-gray-300 px-2 p-1 rounded-lg items-center hover:bg-gray-400;
+  }
+
+  .failed {
+    animation: shake-animation 0.5s ease;
+  }
+
+  @keyframes shake-animation {
+    0% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-5px);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+    75% {
+      transform: translateX(-5px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+}

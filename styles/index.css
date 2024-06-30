@@ -7,155 +7,68 @@
     clip-path: inset(0.6px);
   }
 }
-@font-face {
-  font-family: 'orkney';
-  src: url('/fonts/Orkney Light.otf') format('opentype');
-}
 
 @layer base {
   html,
   body {
-    /* @apply m-2; */
     font-family: 'orkney';
   }
 
   main {
-    @apply mx-auto max-w-[1960px] p-2;
+    @apply mx-auto max-w-[1960px];
   }
 
   h1 {
     @apply text-3xl font-bold;
   }
+  /* button {
+    @apply bg-blue-500
+  } */
 }
+
 @layer components {
-  .timestamp {
-    @apply mx-2 text-gray-600;
-  }
-
-  .username {
-    @apply mx-2 font-bold;
-  }
-
-  .message {
-    @apply flex flex-row justify-start;
-    background-color: #f0f0f0;
-    padding: 8px;
-    margin-bottom: 4px;
-  }
-
-  .input-container {
-    display: flex;
-    margin-top: 20px;
-    bottom: 0;
-  }
-
-  .input-field {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-right: 8px;
-  }
-
-  .send-button {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .send-button:hover {
-    background-color: #0056b3;
-  }
-
-  /* styles/globals.css */
-
-  .container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
-
-  .submit {
-    @apply text-black;
-    border: 1px solid black;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-
-  input {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid black;
-  }
-
-  .button {
-    /* width: 100%; */
-    padding: 10px;
-    font-size: 16px;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #0053a1;
-  }
-
-  p {
-    margin-top: 20px;
-  }
-
   Link,
   a {
-    color: #0053a1;
+    @apply cursor-pointer;
+  }
+
+  .home-container {
+    @apply flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center p-4;
+  }
+  .home-title {
+    @apply text-4xl font-bold mb-6;
+  }
+  .home-banner {
+    @apply bg-blue-500 text-white rounded-lg p-6 mb-6 shadow-lg;
+  }
+  .home-blurb {
+    @apply text-xl;
+  }
+  .home-auth-container {
+    @apply flex flex-col items-center;
+  }
+  .home-welcome {
+    @apply text-xl mb-4;
+  }
+  .home-logged-in {
+    @apply flex flex-row items-center space-x-4;
+  }
+  .home-link {
+    @apply text-white py-2 px-4 rounded-full mb-4 hover:bg-opacity-75;
+  }
+  .home-dashboard-button {
+    @apply bg-green-500 flex items-center;
+  }
+  .home-dashboard-button:hover {
+    @apply bg-green-700;
+  }
+  .home-icon {
+    @apply mr-2;
+  }
+  .home-login-button {
+    @apply bg-blue-500 hover:bg-blue-700;
+  }
+  .home-link.home-logout-button {
+    @apply bg-red-500 hover:bg-red-700;
   }
 }
-
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-} */

@@ -12,7 +12,7 @@ import {
   DELETE_ROOM,
   GET_SERVER_ROOMS,
   FETCH_SERVER_NAME,
-} from '../../utils/Apollo/queries'
+} from '../../../utils/Apollo/queries'
 import { useQuery, useMutation } from '@apollo/client'
 import Head from 'next/head'
 
@@ -22,14 +22,14 @@ export default function ServerHome() {
   const { user, error, isLoading } = useUser()
   const [rooms, setRooms] = useState([])
 
-  const { loading: serverNameLoading, data: serverNameData } = useQuery(FETCH_SERVER_NAME, {
-    variables: { server_id },
-  })
+  // const { loading: serverNameLoading, data: serverNameData } = useQuery(FETCH_SERVER_NAME, {
+  //   variables: { server_id },
+  // })
 
-  let serverName
-  if (serverNameData && serverNameData.servers && serverNameData.servers.length > 0) {
-    serverName = serverNameData.servers[0].server_name
-  }
+  // let serverName
+  // if (serverNameData && serverNameData.servers && serverNameData.servers.length > 0) {
+  //   serverName = serverNameData.servers[0].server_name
+  // }
 
   const { loading: getServerRoomsLoading, data: getServerRoomsData } = useQuery(GET_SERVER_ROOMS, {
     variables: { server_id },
@@ -46,65 +46,70 @@ export default function ServerHome() {
     }
   }, [getServerRoomsData])
 
-  const [newRoomInputOpen, setRoomInputOpen] = useState(false)
-  const [newRoomName, setNewRoomName] = useState('')
+  // const [newRoomInputOpen, setRoomInputOpen] = useState(false)
+  // const [newRoomName, setNewRoomName] = useState('')
 
-  const [createNewRoom] = useMutation(CREATE_NEW_ROOM)
-  const handleCreateNewRoom = async () => {
-    const room_id = generate8CharId()
+  // const [createNewRoom] = useMutation(CREATE_NEW_ROOM)
+  // const handleCreateNewRoom = async () => {
+  //   const room_id = generate8CharId()
 
-    try {
-      await createNewRoom({
-        variables: {
-          room_id,
-          room_name: newRoomName,
-          server_id,
-        },
-        refetchQueries: [{ query: GET_SERVER_ROOMS, variables: { server_id } }],
-      })
-      setNewRoomName('')
-    } catch (error) {
-      toast.error('Failed to create room! Please try again.')
-      console.error(error)
+  //   try {
+  //     await createNewRoom({
+  //       variables: {
+  //         room_id,
+  //         room_name: newRoomName,
+  //         server_id,
+  //       },
+  //       refetchQueries: [{ query: GET_SERVER_ROOMS, variables: { server_id } }],
+  //     })
+  //     setNewRoomName('')
+  //   } catch (error) {
+  //     toast.error('Failed to create room! Please try again.')
+  //     console.error(error)
+  //   }
+  // }
+
+  // const openRoomInput = () => {
+  //   setRoomInputOpen(true)
+  // }
+  // const handleKeyDown = (event) => {
+  //   if (event.key === 'Enter') {
+  //     event.preventDefault()
+  //     handleCreateNewRoom()
+  //   }
+  // }
+
+  // const [deleteRoom] = useMutation(DELETE_ROOM)
+  // const handleDeleteRoom = async (roomId) => {
+  //   const confirmDelete = window.confirm('Are you sure you want to delete this room?')
+
+  //   if (confirmDelete) {
+  //     try {
+  //       await deleteRoom({
+  //         variables: {
+  //           server_id,
+  //           room_id: roomId,
+  //         },
+  //         refetchQueries: [{ query: GET_SERVER_ROOMS, variables: { server_id } }],
+  //       })
+  //     } catch (error) {
+  //       toast.error('Failed to delete room! Please try again.')
+  //       console.error(error)
+  //     }
+  //   }
+  // }
+  useEffect(() => {
+    if (rooms.length > 0) {
+      router.push(`/chat/${server_id}/${rooms[0].room_id}`)
     }
-  }
-
-  const openRoomInput = () => {
-    setRoomInputOpen(true)
-  }
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      handleCreateNewRoom()
-    }
-  }
-
-  const [deleteRoom] = useMutation(DELETE_ROOM)
-  const handleDeleteRoom = async (roomId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this room?')
-
-    if (confirmDelete) {
-      try {
-        await deleteRoom({
-          variables: {
-            server_id,
-            room_id: roomId,
-          },
-          refetchQueries: [{ query: GET_SERVER_ROOMS, variables: { server_id } }],
-        })
-      } catch (error) {
-        toast.error('Failed to delete room! Please try again.')
-        console.error(error)
-      }
-    }
-  }
-
-  if (getServerRoomsLoading || serverNameLoading || isLoading) return <Loading />
+  }, [rooms, router, server_id])
+  
+  if (getServerRoomsLoading || isLoading) return <Loading />
   if (error) return <div>{error.message}</div>
 
   return (
     <>
-      <Head>
+      {/* <Head>
         <title>{serverName}</title>
       </Head>
       <main>
@@ -136,7 +141,7 @@ export default function ServerHome() {
             )}
           </div>
         )}
-      </main>
+      </main> */}
     </>
   )
 }

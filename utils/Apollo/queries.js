@@ -1,18 +1,25 @@
 import { gql } from '@apollo/client'
 
 const MESSAGES_SUBSCRIPTION = gql`
-  subscription OnNewMessage($roomId: String!) {
-    messages(order_by: { timestamp: asc }, where: { room_id: { _eq: $roomId } }) {
+  subscription OnNewMessage($roomId: String!, $limit: Int!, $offset: Int!) {
+    messages(
+      order_by: { timestamp: desc }
+      where: { room_id: { _eq: $roomId } }
+      limit: $limit
+      offset: $offset
+    ) {
       id
       message_text
       timestamp
       user_id
       user {
         username
+        pfp
       }
     }
   }
 `
+
 const SEND_MESSAGE = gql`
   mutation SendMessage($message_text: String!, $room_id: String!, $user_id: uuid!) {
     insert_messages_one(
@@ -109,6 +116,27 @@ const LEAVE_SERVER = gql`
     }
   }
 `
+
+const GET_USER_PROFILE = gql`
+  query GetUserProfile($user_id: uuid!) {
+    users(where: { id: { _eq: $user_id } }) {
+      id
+      pfp
+      username
+    }
+  }
+`
+const UPDATE_USER_PROFILE_PICTURE = gql`
+  mutation UpdateUserProfilePicture($user_id: uuid!, $pfp: String!) {
+    update_users(where: { id: { _eq: $user_id } }, _set: { pfp: $pfp }) {
+      returning {
+        pfp
+        id
+      }
+    }
+  }
+`
+
 export {
   MESSAGES_SUBSCRIPTION,
   SEND_MESSAGE,
@@ -120,5 +148,7 @@ export {
   GET_USER_SERVERS,
   FETCH_SERVER_NAME,
   CREATE_NEW_SERVER,
-  LEAVE_SERVER
+  LEAVE_SERVER,
+  GET_USER_PROFILE,
+  UPDATE_USER_PROFILE_PICTURE,
 }
