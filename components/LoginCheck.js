@@ -9,15 +9,16 @@ const LoginCheck = ({ children }) => {
 
   useEffect(() => {
     if (!isLoading) {
-      const currentPath = router.pathname
-      if (currentPath !== '/' && !user) {
+      if (router.pathname !== '/' && !user) {
         router.push('/api/auth/login')
       }
     }
   }, [user, isLoading, router])
 
   if (isLoading || !user) {
-    return <Loading />
+    if (router.pathname !== '/') {
+      return <Loading />
+    }
   }
 
   return <>{children}</>
