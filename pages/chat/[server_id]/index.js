@@ -9,7 +9,7 @@ import { useUserData } from '@/components/InfoProvider'
 export default function ServerHome() {
   const router = useRouter()
   const { server_id } = router.query
-  // const { , error: userError, isLoading: userLoading } = useUser()
+  const { error: userError, isLoading: userLoading } = useUser()
   const [rooms, setRooms] = useState([])
   const userData = useUserData().users[0]
   // Query to get server rooms
