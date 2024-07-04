@@ -71,4 +71,50 @@
   .home-link.home-logout-button {
     @apply bg-red-500 hover:bg-red-700;
   }
+
+  /* Unauthorized */
+  .unauth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    background-color: #f8f8f8;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .unauth-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .unauth-text {
+    margin-bottom: 1rem;
+  }
+  
+  .unauth-btn {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .unauth-btn:hover {
+    background-color: #005bb5;
+  }
+  
+  .unauth-link {
+    color: #0070f3;
+    text-decoration: none;
+    margin: 10px;
+  }
+  
+  .unauth-link:hover {
+    text-decoration: underline;
+  }
 }

@@ -136,6 +136,14 @@ const UPDATE_USER_PROFILE_PICTURE = gql`
     }
   }
 `
+const CHECK_USER_SERVER_PERMISSIONS = gql`
+  query CheckUserServerPermissions($user_id: uuid!, $server_id: String!) {
+    user_servers(where: { user_id: { _eq: $user_id }, server_id: { _eq: $server_id } }) {
+      server_id
+      user_id
+    }
+  }
+`
 
 export {
   MESSAGES_SUBSCRIPTION,
@@ -151,4 +159,5 @@ export {
   LEAVE_SERVER,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE_PICTURE,
+  CHECK_USER_SERVER_PERMISSIONS
 }

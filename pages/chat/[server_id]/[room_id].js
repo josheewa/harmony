@@ -8,7 +8,12 @@ import { MdError } from 'react-icons/md'
 import { FaHashtag } from 'react-icons/fa'
 import Loading from '@/components/Loading'
 import { convertTimestamp, formatDateLabel, groupMessagesByDate } from '@/utils/functions'
-import { MESSAGES_SUBSCRIPTION, SEND_MESSAGE, FETCH_ROOM_NAME } from '@/utils/Apollo/queries'
+import {
+  MESSAGES_SUBSCRIPTION,
+  SEND_MESSAGE,
+  FETCH_ROOM_NAME,
+  CHECK_USER_SERVER_PERMISSIONS,
+} from '@/utils/Apollo/queries'
 import UserPfp from '@/components/UserPfp'
 import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
@@ -17,7 +22,7 @@ import { useUserData } from '@/components/InfoProvider'
 export default function ChatRoom() {
   // const { user, isLoading } = useUser()
   const router = useRouter()
-  const { room_id } = router.query
+  const { room_id, server_id } = router.query
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
   const messagesEndRef = useRef(null)
@@ -32,6 +37,16 @@ export default function ChatRoom() {
   const { loading: roomNameLoading, data: roomNameData } = useQuery(FETCH_ROOM_NAME, {
     variables: { room_id },
     skip: !room_id, // Skip the query if room_id is not defined
+  })
+
+  // Query to check user permissions
+  const {
+    loading: checkPermissionsLoading,
+    data: checkPermissionsData,
+    error: checkPermissionsError,
+  } = useQuery(CHECK_USER_SERVER_PERMISSIONS, {
+    variables: { user_id: userData.id, server_id },
+    skip: !userData, // Skip the query if user is not loaded
   })
 
   const { error: subsError, loading: subsLoading } = useSubscription(MESSAGES_SUBSCRIPTION, {
@@ -66,6 +81,12 @@ export default function ChatRoom() {
       }
     },
   })
+
+  useEffect(() => {
+    if (checkPermissionsData && checkPermissionsData.user_servers.length === 0) {
+      router.push('/unauthorized')
+    }
+  }, [checkPermissionsData, router])
 
   useEffect(() => {
     if (room_id) {
