@@ -15,7 +15,6 @@ import {
   DELETE_ROOM,
   CREATE_NEW_ROOM,
   CREATE_NEW_SERVER,
-  GET_USER_PROFILE,
   UPDATE_USER_PROFILE_PICTURE,
 } from '@/utils/Apollo/queries'
 import Link from 'next/link'
@@ -25,28 +24,23 @@ import UserPfp from '../UserPfp'
 import { useUserData } from '../InfoProvider'
 
 const Layout = ({ children }) => {
+  // User data
   const userData = useUserData().users[0]
-  const router = useRouter()
-
   const user_id = userData.id
   const username = userData.username
   const pfp = userData.pfp
 
+  // Router
+  const router = useRouter()
   const isChatPath = router.pathname.startsWith('/chat/')
   const isInServer = isChatPath && !router.pathname.startsWith('/chat/dashboard')
+
+  // States
+  // Server-related states
   const [servers, setServers] = useState([])
   const { data: getUserServersData } = useQuery(GET_USER_SERVERS, {
     variables: { user_id },
   })
-  const { data: userProfileData } = useQuery(GET_USER_PROFILE, {
-    variables: { user_id },
-  })
-
-  useEffect(() => {
-    if (getUserServersData) {
-      setServers(getUserServersData.user_servers)
-    }
-  }, [getUserServersData])
 
   const [rooms, setRooms] = useState([])
   const { server_id } = router.query
@@ -58,11 +52,28 @@ const Layout = ({ children }) => {
     variables: { server_id },
   })
 
-  let serverName
-  if (serverNameData && serverNameData.servers && serverNameData.servers.length > 0) {
-    serverName = serverNameData.servers[0].server_name
-  }
+  // User settings-related states
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false)
+  const [newRoomName, setNewRoomName] = useState('')
+  const [isCreatingServer, setIsCreatingServer] = useState(false)
+  const [newServerName, setNewServerName] = useState('')
 
+  const [userSettingsOpen, setUserSettingsOpen] = useState(false)
+  const [newProfilePic, setNewProfilePic] = useState('')
+  const [profilePicSource, setProfilePicSource] = useState('')
+  const [profilePicSourceInput, setProfilePicSourceInput] = useState('')
+
+  const [dropdownVisible, setDropdownVisible] = useState(null)
+
+  // Effects
+  // Fetch user servers
+  useEffect(() => {
+    if (getUserServersData) {
+      setServers(getUserServersData.user_servers)
+    }
+  }, [getUserServersData])
+
+  // Fetch server rooms
   useEffect(() => {
     try {
       if (isInServer && getServerRoomsData) {
@@ -74,13 +85,38 @@ const Layout = ({ children }) => {
     }
   }, [getServerRoomsData, isInServer])
 
-  const [dropdownVisible, setDropdownVisible] = useState(null)
+  // Handle escape key for settings modal
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        handleSettingsClose()
+      }
+    }
 
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  // Fetch server name
+  let serverName
+  if (serverNameData && serverNameData.servers && serverNameData.servers.length > 0) {
+    serverName = serverNameData.servers[0].server_name
+  }
+
+  // Mutation handlers
+  const [deleteRoom] = useMutation(DELETE_ROOM)
+  const [createRoom] = useMutation(CREATE_NEW_ROOM)
+  const [createServer] = useMutation(CREATE_NEW_SERVER)
+  const [updateUserProfilePicture] = useMutation(UPDATE_USER_PROFILE_PICTURE)
+
+  // Function handlers
   const toggleDropdown = (roomId) => {
     setDropdownVisible((prev) => (prev === roomId ? null : roomId))
   }
 
-  const [deleteRoom] = useMutation(DELETE_ROOM)
   const handleDeleteRoom = async (roomId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this room?')
 
@@ -100,7 +136,6 @@ const Layout = ({ children }) => {
     }
   }
 
-  const [createRoom] = useMutation(CREATE_NEW_ROOM)
   const handleCreateRoom = async (roomName) => {
     const room_id = generate8CharId()
     try {
@@ -118,9 +153,6 @@ const Layout = ({ children }) => {
       console.error(error)
     }
   }
-
-  const [isCreatingRoom, setIsCreatingRoom] = useState(false)
-  const [newRoomName, setNewRoomName] = useState('')
 
   const handleCreateRoomClick = () => {
     setIsCreatingRoom(true)
@@ -143,11 +175,6 @@ const Layout = ({ children }) => {
     setIsCreatingRoom(false)
   }
 
-  const [createServer] = useMutation(CREATE_NEW_SERVER)
-
-  const [isCreatingServer, setIsCreatingServer] = useState(false)
-  const [newServerName, setNewServerName] = useState('')
-
   const handleCreateServer = async () => {
     const server_id = generate8CharId()
     try {
@@ -165,11 +192,6 @@ const Layout = ({ children }) => {
       console.error('Error creating server:', error)
     }
   }
-
-  const [userSettingsOpen, setUserSettingsOpen] = useState(false)
-
-  const [newProfilePic, setNewProfilePic] = useState('')
-  const [profilePicSource, setProfilePicSource] = useState('')
 
   const handleSettingsClick = () => {
     setUserSettingsOpen(true)
@@ -190,6 +212,17 @@ const Layout = ({ children }) => {
     if (e.target.files[0]) {
       setNewProfilePic(e.target.files[0])
       setProfilePicSource(URL.createObjectURL(e.target.files[0]))
+    }
+  }
+
+  const handleProfilePicSourceSubmit = async (e) => {
+    const url = profilePicSourceInput
+    setNewProfilePic('')
+    if (await isImageLinkValid(url)) {
+      setProfilePicSource(url)
+    } else {
+      setProfilePicSource('')
+      toast.error('The provided URL is not a valid image')
     }
   }
 
@@ -220,15 +253,27 @@ const Layout = ({ children }) => {
     const file = newProfilePic
     cloudinaryUploadProfilePic(file)
   }
-  const [updateUserProfilePicture] = useMutation(UPDATE_USER_PROFILE_PICTURE)
 
   const handleProfilePicSubmit = async () => {
+    const src = profilePicSource
+    if (!isValidURL(src)) {
+      toast.error('Invalid URL')
+      return
+    }
+
+    const imageValid = await isImageLinkValid(src)
+    if (!imageValid) {
+      console.log(src)
+      toast.error('The provided URL is not a valid image')
+      return
+    }
+
     try {
-      if (profilePicSource) {
+      if (src) {
         await updateUserProfilePicture({
           variables: {
             user_id,
-            pfp: profilePicSource,
+            pfp: src,
           },
         })
         toast.success('Profile picture updated successfully!')
@@ -241,19 +286,25 @@ const Layout = ({ children }) => {
     }
   }
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        handleSettingsClose()
-      }
+  // Helper functions
+  const isImageLinkValid = async (url) => {
+    try {
+      const response = await fetch(url)
+      const contentType = response.headers.get('content-type')
+      return contentType && contentType.startsWith('image')
+    } catch (error) {
+      console.error('Error validating image link:', error)
+      return false
     }
+  }
 
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
+  const isValidURL = (url) => {
+    const urlPattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-zA-Z\\d])([a-zA-Z\\d-])*[a-zA-Z\\d])\\.)+([a-zA-Z]{2,6})(\\/[^\\s]*)?$'
+    )
+    return urlPattern.test(url)
+  }
 
   return (
     <div className="sidebar-container">
@@ -392,10 +443,17 @@ const Layout = ({ children }) => {
                   style={{ display: 'none' }}
                 />
                 {/* Image preview */}
+
                 {profilePicSource && (
                   <div className="profile-pic-preview">
                     Preview:
-                    <Image src={profilePicSource} alt="Profile Preview" width={100} height={100} />
+                    <Image
+                      src={profilePicSource}
+                      alt="Profile Picture Preview"
+                      width={100}
+                      height={100}
+                      className="rounded-full"
+                    />
                   </div>
                 )}
                 {profilePicSource && (
@@ -416,11 +474,16 @@ const Layout = ({ children }) => {
                 <div className="link-container">
                   <input
                     type="text"
-                    value={newProfilePic}
-                    onChange={(e) => setProfilePicSource(e.target.value)}
+                    value={profilePicSourceInput}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleProfilePicSourceSubmit()
+                    }}
+                    onChange={(e) => {
+                      setProfilePicSourceInput(e.target.value)
+                    }}
                     placeholder="Enter image URL"
                   />
-                  <button onClick={handleProfilePicSubmit} className='link-upload-btn'>
+                  <button onClick={handleProfilePicSourceSubmit} className="link-upload-btn">
                     <IoIosCloudUpload size={20} />
                   </button>
                 </div>

@@ -128,7 +128,7 @@
     @apply mt-3 text-center p-3;
   }
   .profile-pic-preview img {
-    @apply rounded-full h-24 w-24 object-cover;
+    @apply rounded-full h-32 w-32 object-cover;
   }
   .pfp-menu-btns {
     @apply flex flex-row w-full justify-center items-center;
