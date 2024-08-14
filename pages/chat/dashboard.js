@@ -1,119 +1,40 @@
-import { useState, useEffect } from 'react'
-import { useUser } from '@auth0/nextjs-auth0/client'
-import Link from 'next/link'
-import Image from 'next/image'
-import Loading from '@/components/Loading'
-import { toast } from 'react-toastify'
-import { generate8CharId } from '@/utils/functions'
-import { CREATE_NEW_SERVER, GET_USER_SERVERS, LEAVE_SERVER } from '@/utils/Apollo/queries'
-import { useQuery, useMutation } from '@apollo/client'
-
 export default function Dashboard() {
-  const { user, error, isLoading } = useUser()
-  const [servers, setServers] = useState([])
-
-  const user_id = user?.['harmony/user_uuid']
-
-  const { loading: getUserServersLoading, data: getUserServersData } = useQuery(GET_USER_SERVERS, {
-    variables: { user_id },
-  })
-
-  useEffect(() => {
-    try {
-      if (getUserServersData) {
-        setServers(getUserServersData.user_servers)
-      }
-    } catch (error) {
-      console.log('Failed to fetch servers!')
-      console.error(error)
-    }
-  }, [getUserServersData])
-
-  const [newServerInputOpen, setServerInputOpen] = useState(false)
-  const [newServerName, setNewServerName] = useState('')
-
-  const [createNewServer] = useMutation(CREATE_NEW_SERVER)
-  const handleCreateNewServer = async () => {
-    const server_id = generate8CharId()
-
-    try {
-      await createNewServer({
-        variables: {
-          server_id,
-          server_name: newServerName,
-          user_id,
-        },
-        refetchQueries: [{ query: GET_USER_SERVERS, variables: { user_id } }],
-      })
-      setNewServerName('')
-    } catch (error) {
-      toast.error('Failed to create server! Please try again.')
-      console.error(error)
-    }
-  }
-
-  const openServerInput = () => {
-    setServerInputOpen(true)
-  }
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      handleCreateNewServer()
-    }
-  }
-
-  const [leaveServer] = useMutation(LEAVE_SERVER)
-  const handleLeaveServer = async (server_id) => {
-    const confirmLeave = window.confirm('Are you sure you want to leave this server?')
-
-    if (confirmLeave) {
-      try {
-        await leaveServer({
-          variables: {
-            user_id,
-            server_id,
-          },
-          refetchQueries: [{ query: GET_USER_SERVERS, variables: { user_id } }],
-        })
-        setNewServerName('')
-      } catch (error) {
-        toast.error('Failed to leave server! Please try again.')
-        console.error(error)
-      }
-    }
-  }
-
-  if (getUserServersLoading || isLoading) return <Loading />
-  if (error) return <div>{error.message}</div>
-
   return (
-    user && (
-      <div className="flex flex-col">
-        <Image src={user.picture} alt={user.name} width={45} height={45} />
-        <h2>{user.name}</h2>
-        <p>{user.email}</p>
-        <Link href="/api/auth/logout">Logout</Link>
-        {servers &&
-          servers.map(({ server_id, server }) => (
-            <span key={server_id} className="flex flex-row justify-between m-2">
-              <Link href={`/${server_id}`}>
-                Server: {server.server_name}, ServerID: {server_id}
-              </Link>
-              <button onClick={() => handleLeaveServer(server_id)}>Leave Server</button>
-            </span>
-          ))}
-
-        <button onClick={openServerInput}>New Server</button>
-        {newServerInputOpen && (
-          <input
-            type="text"
-            value={newServerName}
-            onChange={(e) => setNewServerName(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Enter new server name here..."
-          />
-        )}
+    <>
+      <div className="p-6 text-gray-800">
+        <div className="bg-white rounded-lg shadow-md p-5">
+          <h2 className="text-xl font-bold mb-4">Welcome to Harmony!</h2>
+          <p className="mb-4">
+            If you&apos;re new here, you can check out the demo server added by default to your
+            account. Just click on the icon with a {'"D"'} on the left panel.
+          </p>
+          <p className="mb-4">
+            Harmony is currently a work in progress, aimed to emulate Discord, starting from
+            scratch. It&apos;s built with Next.js, uses Hasura Neon&apos;s database for storage, relies
+            on Auth0 for authentication, and implements Cloudinary&apos;s image hosting services.
+          </p>
+          <h3 className="text-lg font-semibold mb-3">Currently Implemented Features:</h3>
+          <ul className="list-disc list-inside mb-4">
+            <li>Fully functional chatrooms, with plans for optimized fetching.</li>
+            <li>Servers containing chatrooms are functional, with ongoing customization work.</li>
+            <li>Server and room creation implemented, with more flexibility coming.</li>
+            <li>User login complete with added profile picture customization.</li>
+          </ul>
+          <h3 className="text-lg font-semibold mb-3">Features in Development:</h3>
+          <ul className="list-disc list-inside mb-4">
+            <li>Friends and private direct messaging.</li>
+            <li>Server customization.</li>
+          </ul>
+          <p>
+            If you find any bugs or have any ideas/suggestions for the app, please open an Issue on
+            Harmony&apos;s{' '}
+            <a href="https://github.com/josheewa/harmony" target='_blank'className="text-blue-500 underline">
+              GitHub Repo
+            </a>
+            . The more detail, the better!
+          </p>
+        </div>
       </div>
-    )
+    </>
   )
 }

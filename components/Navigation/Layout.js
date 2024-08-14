@@ -35,7 +35,7 @@ const Layout = ({ children }) => {
   const isChatPath = router.pathname.startsWith('/chat/')
   const isInServer = isChatPath && !router.pathname.startsWith('/chat/dashboard')
 
-  // States
+  // ?States
   // Server-related states
   const [servers, setServers] = useState([])
   const { data: getUserServersData } = useQuery(GET_USER_SERVERS, {
@@ -396,6 +396,7 @@ const Layout = ({ children }) => {
               <span className="close" onClick={() => setIsCreatingServer(false)}>
                 &times;
               </span>
+              <h2 className="modal-title">Create a New Server</h2>
               <input
                 type="text"
                 value={newServerName}
@@ -414,7 +415,7 @@ const Layout = ({ children }) => {
             <Image className="user-info-pfp" src={pfp} alt={username} width={40} height={40} />
           )}
           {!pfp && <UserPfp username={username} />}
-          <h2>{username}</h2>
+          <h2>{username.length > 8 ? username.slice(0, 8) + '...' : username}</h2>
           <button className="user-settings-button" onClick={handleSettingsClick}>
             <IoMdSettings size={20} />
           </button>
@@ -422,12 +423,12 @@ const Layout = ({ children }) => {
       </div>
       <div className="flex-1">{children}</div>
       {userSettingsOpen && (
-        <div className="user-settings-modal">
-          <div className="user-settings-modal-content">
-            <span className="user-settings-close" onClick={handleSettingsClose}>
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={handleSettingsClose}>
               &times;
             </span>
-            <h2 className="user-settings-title">User Settings</h2>
+            <h2 className="modal-title">User Settings</h2>
             <div className="profile-pic-upload">
               <h3 className="user-settings-description">Upload Profile Picture</h3>
               <div className="upload-container">

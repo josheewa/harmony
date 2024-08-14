@@ -16,11 +16,20 @@
   .server-nav-item {
     @apply mb-5;
   }
+  .modal {
+    @apply flex justify-center items-center fixed z-20 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50;
+  }
+  .modal-content {
+    @apply bg-white p-5 rounded-xl w-96 max-w-[80%];
+  }
+  .modal-title {
+    @apply text-center font-bold text-xl m-2 text-black;
+  }
+  .new-server-input {
+    @apply rounded-xl px-3 border border-black h-10 text-black w-full;
+  }
   .sidebar-logout {
     @apply absolute bottom-0 server-nav-item text-red-500;
-  }
-  .modal {
-    @apply absolute;
   }
   .second-nav-panel {
     @apply w-56 bg-gray-800 text-white text-center overflow-y-auto py-3;
@@ -83,26 +92,17 @@
   .create-room-button {
     @apply flex w-52 justify-center bg-gray-700 py-2 rounded-full mx-2;
   }
-  .user-settings-modal {
-    @apply flex justify-center items-center fixed z-20 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50;
-  }
-  .user-settings-title {
-    @apply text-center font-bold text-xl m-2;
-  }
   .user-settings-description {
     @apply text-center m-3 underline;
   }
-  .user-settings-modal-content {
-    @apply bg-white p-5 rounded-xl w-96 max-w-[80%];
-  }
-  .user-settings-close {
+  .close {
     @apply text-gray-400 float-right text-3xl font-bold;
   }
-  .user-settings-close:hover,
-  .user-settings-close:focus {
+  .close:hover,
+  .close:focus {
     @apply text-black cursor-pointer;
   }
-  .user-settings-modal button {
+  .modal button {
     @apply text-white border-none cursor-pointer;
   }
   .custom-file-upload {
