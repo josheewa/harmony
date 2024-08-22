@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-// import { useUser } from '@auth0/nextjs-auth0/client'
 import { useSubscription, useMutation, useQuery } from '@apollo/client'
 import Head from 'next/head'
 import { IoMdSend, IoMdRefresh } from 'react-icons/io'
@@ -185,20 +184,22 @@ export default function ChatRoom() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <main className="relative">
-        <div className="chat-wrapper">
-          <div className="chat-header">
+        <div className="chat-wrapper flex flex-col h-screen">
+          <div className="chat-header flex flex-row sticky items-center text-2xl justify-center w-full bg-gray-700 text-white py-6">
             <FaHashtag />
             {`${roomName}`}
           </div>
 
-          <div className="messages-container">
+          <div className="messages-container flex flex-col-reverse overflow-auto justify-start h-full">
             <div ref={messagesEndRef}></div>
             {groupedMessages.map((group, index) => (
-              <div key={index} className="message-group">
+              <div key={index} className="message-group flex flex-col-reverse">
                 {group.messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`message ${message.failed ? 'failed' : ''} flex flex-row `}>
+                    className={`message flex flex-row justify-start bg-gray-100 p-2 ${
+                      message.failed ? 'failed' : ''
+                    } flex flex-row `}>
                     <div className="message-pfp">
                       {!message.user.pfp && <UserPfp username={message.user.username} />}
                       {message.user.pfp && (
@@ -207,23 +208,25 @@ export default function ChatRoom() {
                           alt="profile picture"
                           width={40}
                           height={40}
-                          className="chat-pfp"
+                          className="chat-pfp rounded-full"
                         />
                       )}
                     </div>
-                    <div className="message-body flex flex-col">
+                    <div className="message-body flex flex-col mx-4">
                       <div className="message-header">
-                        <span className="username">{message.user.username}</span>
-                        <span className="timestamp">{convertTimestamp(message.timestamp)}</span>
+                        <span className="username font-bold">{message.user.username}</span>
+                        <span className="timestamp mx-2 text-gray-600 text-xs">
+                          {convertTimestamp(message.timestamp)}
+                        </span>
                       </div>
                       <span className="message-text">{message.message_text}</span>
                       {message.failed && (
-                        <span className="message-fail-banner">
+                        <span className="message-fail-banner flex flex-row items-center text-red-500">
                           <MdError />
-                          <span>Message failed to send. Please try again.</span>
+                          <span className="mx-2">Message failed to send. Please try again.</span>
                           <button
                             onClick={() => handleReSendMessage(message)}
-                            className="resend-button">
+                            className="resend-button text-black mx-2 border-none flex flex-row bg-gray-300 px-2 p-1 rounded-lg items-center hover:bg-gray-400">
                             Retry
                             <IoMdRefresh size={20} />
                           </button>
@@ -232,29 +235,33 @@ export default function ChatRoom() {
                     </div>
                   </div>
                 ))}
-                <div className="date-separator">{formatDateLabel(group.date)}</div>
+                <div className="date-separator flex items-center text-center w-full text-gray-400 text-sm my-2">
+                  {formatDateLabel(group.date)}
+                </div>
               </div>
             ))}
             {!hasMore && (
-              <div className="room-start-banner">
+              <div className="room-start-banner p-5 text-gray-800 border-b-4 border-double border-gray-300">
                 <FaHashtag size={50} />
-                <h1>Welcome to #{roomName}</h1>
+                <h1 className="my-2">Welcome to #{roomName}</h1>
                 <h2>This is the start of the #{roomName} room.</h2>
               </div>
             )}
             <div ref={topRef}></div>
           </div>
 
-          <div className="input-container">
+          <div className="input-container bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1 border border-gray-300">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={`Message #${roomName}`}
-              className="input-field"
+              className="input-field border-none outline-none bg-transparent w-full text-lg p-2 text-white placeholder:text-gray-50"
             />
-            <button onClick={handleMessageSend} className="send-button">
+            <button
+              onClick={handleMessageSend}
+              className="send-button bg-transparent rounded-full px-3 text-gray-50 hover:text-gray-800">
               <IoMdSend size={20} />
             </button>
           </div>
