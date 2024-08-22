@@ -339,32 +339,34 @@ const Layout = ({ children }) => {
         {isInServer && (
           <>
             <div className="sidebar-server-name font-bold text-xl my-5">{serverName}</div>
-            {rooms &&
-              rooms.map(({ room_id, room }) => (
-                <div className="room-link-container flex flex-row mx-1 bg-gray-700" key={room_id}>
-                  <Link
-                    href={`/chat/${server_id}/${room_id}`}
-                    className={`sidebar-rooms bg-gray-700 h-full w-full text-left px-3 py-2 text-gray-200 flex flex-row justify-between rounded-lg hover:bg-gray-800 ${
-                      room_id === router.query.room_id ? 'current-room' : ''
-                    }`}>
-                    <div className="room-nametext-gray-200 flex flex-row items-center">
-                      <FaHashtag />
-                      {room.room_name}
-                    </div>
-                  <div className="more-button-container relative items-center flex px-1 text-white hover:text-gray-400">
-                    <button className="more-button" onClick={() => toggleDropdown(room_id)}>
-                      <BsThreeDotsVertical />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        dropdownVisible === room_id ? 'visible' : 'hidden'
+            <div className="sidebar-rooms-wrapper bg-gray-700 rounded-lg">
+              {rooms &&
+                rooms.map(({ room_id, room }) => (
+                  <div className="room-link-container flex flex-row" key={room_id}>
+                    <Link
+                      href={`/chat/${server_id}/${room_id}`}
+                      className={`sidebar-rooms bg-gray-700 h-full w-full text-left px-3 py-2 text-gray-200 flex flex-row justify-between rounded-lg hover:bg-gray-800 ${
+                        room_id === router.query.room_id ? 'current-room' : ''
                       }`}>
-                      <button onClick={() => handleDeleteRoom(room_id)}>Delete Room</button>
-                    </div>
+                      <div className="room-nametext-gray-200 flex flex-row items-center">
+                        <FaHashtag />
+                        {room.room_name}
+                      </div>
+                      <div className="more-button-container relative items-center flex px-1 text-white hover:text-gray-400">
+                        <button className="more-button" onClick={() => toggleDropdown(room_id)}>
+                          <BsThreeDotsVertical />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            dropdownVisible === room_id ? 'visible' : 'hidden'
+                          }`}>
+                          <button onClick={() => handleDeleteRoom(room_id)}>Delete Room</button>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                  </Link>
-                </div>
-              ))}
+                ))}
+            </div>
             {isCreatingRoom ? (
               <div className="new-room-container w-full flex flex-row items-center px-3">
                 <input
