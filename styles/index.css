@@ -21,9 +21,6 @@
   h1 {
     @apply text-3xl font-bold;
   }
-  /* button {
-    @apply bg-blue-500
-  } */
 }
 
 @layer components {
@@ -49,27 +46,6 @@
   }
   .home-welcome {
     @apply text-xl mb-4;
-  }
-  .home-logged-in {
-    @apply flex flex-row items-center space-x-4;
-  }
-  .home-link {
-    @apply text-white py-2 px-4 rounded-full mb-4 hover:bg-opacity-75;
-  }
-  .home-dashboard-button {
-    @apply bg-green-500 flex items-center;
-  }
-  .home-dashboard-button:hover {
-    @apply bg-green-700;
-  }
-  .home-icon {
-    @apply mr-2;
-  }
-  .home-login-button {
-    @apply bg-blue-500 hover:bg-blue-700;
-  }
-  .home-link.home-logout-button {
-    @apply bg-red-500 hover:bg-red-700;
   }
 
   /* Unauthorized */
