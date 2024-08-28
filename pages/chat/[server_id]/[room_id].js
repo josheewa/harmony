@@ -165,6 +165,7 @@ export default function ChatRoom() {
 
   const groupedMessages = groupMessagesByDate(messages) // Group messages after sorting
 
+  // console.log(groupedMessages)
   useEffect(() => {
     if (!initialLoad && inView && hasMore && !isFetching) {
       setIsFetching(true)
@@ -192,19 +193,20 @@ export default function ChatRoom() {
 
           <div className="messages-container flex flex-col-reverse overflow-auto justify-start h-full">
             <div ref={messagesEndRef}></div>
-            {groupedMessages.map((group, index) => (
-              <div key={index} className="message-group flex flex-col-reverse">
-                {group.messages.map((message, index) => (
+            {/* Iterate over date groups */}
+            {groupedMessages.map((dateGroup, dateIndex) => (
+              <div key={dateIndex} className="date-group flex flex-col-reverse">
+                {/* Iterate over subgroups within each date group */}
+                {dateGroup.groups.map((subGroup, subGroupIndex) => (
                   <div
-                    key={index}
-                    className={`message flex flex-row justify-start bg-gray-100 p-2 ${
-                      message.failed ? 'failed' : ''
-                    } flex flex-row `}>
-                    <div className="message-pfp">
-                      {!message.user.pfp && <UserPfp username={message.user.username} />}
-                      {message.user.pfp && (
+                    key={subGroupIndex}
+                    className="subgroup-container flex flex-row items-start p-2 bg-gray-100 my-[0.5px] rounded-lg">
+                    {/* Display profile picture and username for the subgroup */}
+                    <div className="message-pfp mr-4">
+                      {!subGroup[0].user.pfp && <UserPfp username={subGroup[0].user.username} />}
+                      {subGroup[0].user.pfp && (
                         <Image
-                          src={`${message.user.pfp}`}
+                          src={`${subGroup[0].user.pfp}`}
                           alt="profile picture"
                           width={40}
                           height={40}
@@ -212,20 +214,34 @@ export default function ChatRoom() {
                         />
                       )}
                     </div>
-                    <div className="message-body flex flex-col mx-4">
+
+                    {/* Messages Container for the Subgroup */}
+                    <div className="messages-content flex flex-col">
+                      {/* Display Username and Timestamp once for the entire subgroup */}
                       <div className="message-header">
-                        <span className="username font-bold">{message.user.username}</span>
+                        <span className="username font-bold">{subGroup[0].user.username}</span>
                         <span className="timestamp mx-2 text-gray-600 text-xs">
-                          {convertTimestamp(message.timestamp)}
+                          {convertTimestamp(subGroup[0].timestamp)}
                         </span>
                       </div>
-                      <span className="message-text">{message.message_text}</span>
-                      {message.failed && (
-                        <span className="message-fail-banner flex flex-row items-center text-red-500">
+                      <div className="submessages flex flex-col-reverse">
+                        {/* Display all messages in the subgroup */}
+                        {subGroup.map((message, messageIndex) => (
+                          <div key={messageIndex} className="message-text mb-1">
+                            {message.message_text}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* If any message failed, show the retry button for the entire subgroup */}
+                      {subGroup.some((message) => message.failed) && (
+                        <span className="message-fail-banner flex flex-row items-center text-red-500 mt-2">
                           <MdError />
-                          <span className="mx-2">Message failed to send. Please try again.</span>
+                          <span className="mx-2">
+                            Some messages failed to send. Please try again.
+                          </span>
                           <button
-                            onClick={() => handleReSendMessage(message)}
+                            onClick={() => handleReSendMessage(subGroup)}
                             className="resend-button text-black mx-2 border-none flex flex-row bg-gray-300 px-2 p-1 rounded-lg items-center hover:bg-gray-400">
                             Retry
                             <IoMdRefresh size={20} />
@@ -235,11 +251,14 @@ export default function ChatRoom() {
                     </div>
                   </div>
                 ))}
+                {/* Date separator for each group */}
                 <div className="date-separator flex items-center text-center w-full text-gray-400 text-sm my-2">
-                  {formatDateLabel(group.date)}
+                  {formatDateLabel(dateGroup.date)}
                 </div>
               </div>
             ))}
+
+            {/* Room Start Banner */}
             {!hasMore && (
               <div className="room-start-banner p-5 text-gray-800 border-b-4 border-double border-gray-300">
                 <FaHashtag size={50} />
@@ -247,6 +266,7 @@ export default function ChatRoom() {
                 <h2>This is the start of the #{roomName} room.</h2>
               </div>
             )}
+
             <div ref={topRef}></div>
           </div>
 
