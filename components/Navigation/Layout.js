@@ -90,6 +90,7 @@ const Layout = ({ children }) => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         handleSettingsClose()
+        setIsCreatingServer(false)
       }
     }
 
@@ -396,7 +397,7 @@ const Layout = ({ children }) => {
           </>
         )}
         {isCreatingServer && (
-          <div className="modal flex justify-center items-center fixed z-20 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50">
+          <div className="modal">
             <div className="modal-content bg-white p-5 rounded-xl w-96 max-w-[80%]">
               <span className="close" onClick={() => setIsCreatingServer(false)}>
                 &times;

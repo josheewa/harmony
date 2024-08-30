@@ -14,6 +14,18 @@
   .dropdown-content button:hover {
     @apply bg-gray-200;
   }
+  .modal {
+    @apply flex justify-center items-center fixed z-20 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50;
+  }
+  .modal-content {
+    @apply bg-white p-5 rounded-xl w-96 max-w-[80%];
+  }
+  .modal-title {
+    @apply text-center font-bold text-xl m-2 text-black;
+  }
+  .modal button {
+    @apply text-white border-none cursor-pointer;
+  }
   .current-room {
     @apply bg-black hover:bg-black;
   }
@@ -35,9 +47,6 @@
   .close:hover,
   .close:focus {
     @apply text-black cursor-pointer;
-  }
-  .modal button {
-    @apply text-white border-none cursor-pointer;
   }
   .custom-file-upload > * {
     @apply mx-1;
