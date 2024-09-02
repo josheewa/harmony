@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { FaHome, FaHashtag, FaPlus, FaFileUpload } from 'react-icons/fa'
-import { FaSquarePlus } from 'react-icons/fa6'
+import { FaHome, FaHashtag, FaPlus } from 'react-icons/fa'
+import { FaSquarePlus, FaPencil } from 'react-icons/fa6'
 import { RiLogoutBoxLine } from 'react-icons/ri'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 import { IoMdClose, IoMdSettings, IoIosCloudUpload } from 'react-icons/io'
@@ -19,7 +19,7 @@ import {
 } from '@/utils/Apollo/queries'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
-import { generate8CharId } from '@/utils/functions'
+import { generate8CharId, isImageLinkValid, isValidURL } from '@/utils/functions'
 import UserPfp from '../UserPfp'
 import { useUserData } from '../InfoProvider'
 
@@ -59,9 +59,6 @@ const Layout = ({ children }) => {
   const [newServerName, setNewServerName] = useState('')
 
   const [userSettingsOpen, setUserSettingsOpen] = useState(false)
-  const [newProfilePic, setNewProfilePic] = useState('')
-  const [profilePicSource, setProfilePicSource] = useState('')
-  const [profilePicSourceInput, setProfilePicSourceInput] = useState('')
 
   const [dropdownVisible, setDropdownVisible] = useState(null)
 
@@ -117,7 +114,6 @@ const Layout = ({ children }) => {
   const toggleDropdown = (roomId) => {
     setDropdownVisible((prev) => (prev === roomId ? null : roomId))
   }
-
   const handleDeleteRoom = async (roomId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this room?')
 
@@ -136,7 +132,6 @@ const Layout = ({ children }) => {
       }
     }
   }
-
   const handleCreateRoom = async (roomName) => {
     const room_id = generate8CharId()
     try {
@@ -154,15 +149,12 @@ const Layout = ({ children }) => {
       console.error(error)
     }
   }
-
   const handleCreateRoomClick = () => {
     setIsCreatingRoom(true)
   }
-
   const handleRoomNameChange = (e) => {
     setNewRoomName(e.target.value)
   }
-
   const handleRoomNameSubmit = () => {
     if (newRoomName.trim() !== '') {
       handleCreateRoom(newRoomName)
@@ -170,12 +162,10 @@ const Layout = ({ children }) => {
       setIsCreatingRoom(false)
     }
   }
-
   const handleRoomNameCancel = () => {
     setNewRoomName('')
     setIsCreatingRoom(false)
   }
-
   const handleCreateServer = async () => {
     const server_id = generate8CharId()
     try {
@@ -193,44 +183,34 @@ const Layout = ({ children }) => {
       console.error('Error creating server:', error)
     }
   }
-
   const handleSettingsClick = () => {
     setUserSettingsOpen(true)
   }
-
   const handleSettingsClose = () => {
     setUserSettingsOpen(false)
     setNewProfilePic('')
     setProfilePicSource('')
   }
+  const [newProfilePic, setNewProfilePic] = useState('')
+  const [profilePicSource, setProfilePicSource] = useState('')
 
   const cancelProfilePicSelection = () => {
     setNewProfilePic('')
     setProfilePicSource('')
   }
 
-  const handleProfilePicFileChange = (e) => {
+  const handleProfilePicFileUpload = (e) => {
     if (e.target.files[0]) {
       setNewProfilePic(e.target.files[0])
       setProfilePicSource(URL.createObjectURL(e.target.files[0]))
     }
   }
 
-  const handleProfilePicSourceSubmit = async (e) => {
-    const url = profilePicSourceInput
-    setNewProfilePic('')
-    if (await isImageLinkValid(url)) {
-      setProfilePicSource(url)
-    } else {
-      setProfilePicSource('')
-      toast.error('The provided URL is not a valid image')
-    }
-  }
-
-  const cloudinaryUploadProfilePic = async (file) => {
+  const uploadProfilePicToCloudinary = async (file) => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME)
+
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -240,71 +220,50 @@ const Layout = ({ children }) => {
         }
       )
       const data = await response.json()
-      console.log('File uploaded successfully:', data)
-      setProfilePicSource(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,h_200,w_200/${data.public_id}`
-      )
-      handleProfilePicSubmit()
+
+      if (data.error) {
+        throw new Error('Failed to upload to Cloudinary')
+      }
+
+      const cloudPfpUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,h_200,w_200/${data.public_id}`
+      // toast.success('Profile picture uploaded successfully!');
+      return cloudPfpUrl
     } catch (error) {
-      console.error('Error uploading file:', error)
+      console.error('Error uploading to Cloudinary:', error)
+      toast.error('Failed to upload profile picture.')
+      throw error
     }
   }
 
-  const handleProfilePicUpload = () => {
-    const file = newProfilePic
-    cloudinaryUploadProfilePic(file)
+  const handleProfilePicUpload = async () => {
+    try {
+      const cloudPfpUrl = await uploadProfilePicToCloudinary(newProfilePic)
+      await updateProfilePic(cloudPfpUrl)
+    } catch (error) {
+      console.error('Profile picture upload failed:', error)
+    }
   }
 
-  const handleProfilePicSubmit = async () => {
-    const src = profilePicSource
-    if (!isValidURL(src)) {
-      toast.error('Invalid URL')
-      return
-    }
-
-    const imageValid = await isImageLinkValid(src)
-    if (!imageValid) {
-      console.log(src)
-      toast.error('The provided URL is not a valid image')
+  const updateProfilePic = async (url) => {
+    if (!isValidURL(url) || !(await isImageLinkValid(url))) {
+      toast.error('Invalid image URL.')
       return
     }
 
     try {
-      if (src) {
-        await updateUserProfilePicture({
-          variables: {
-            user_id,
-            pfp: src,
-          },
-        })
-        toast.success('Profile picture updated successfully!')
-      }
+      await updateUserProfilePicture({
+        variables: {
+          user_id,
+          pfp: url,
+        },
+      })
+      toast.success('Profile picture updated successfully!')
     } catch (error) {
+      console.error('Failed to update profile picture:', error)
       toast.error('Failed to update profile picture! Please try again.')
-      console.error(error)
     } finally {
       handleSettingsClose()
     }
-  }
-
-  // Helper functions
-  const isImageLinkValid = async (url) => {
-    try {
-      const response = await fetch(url)
-      const contentType = response.headers.get('content-type')
-      return contentType && contentType.startsWith('image')
-    } catch (error) {
-      console.error('Error validating image link:', error)
-      return false
-    }
-  }
-
-  const isValidURL = (url) => {
-    const urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-zA-Z\\d])([a-zA-Z\\d-])*[a-zA-Z\\d])\\.)+([a-zA-Z]{2,6})(\\/[^\\s]*)?$'
-    )
-    return urlPattern.test(url)
   }
 
   return (
@@ -446,21 +405,33 @@ const Layout = ({ children }) => {
             </span>
             <h2 className="modal-title">User Settings</h2>
             <div className="profile-pic-upload mb-5">
-              <h3 className="user-settings-description">Upload Profile Picture</h3>
               <div className="upload-container flex flex-col items-center justify-center;">
-                <label
-                  htmlFor="file-upload"
-                  className="custom-file-upload flex justify-center text-center items-center flex-row cursor-pointer py-2 px-3 rounded-md bg-gray-100 border border-gray-300">
-                  <FaFileUpload size={20} />{' '}
-                  <span>Choose {profilePicSource && 'Another'} File</span>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePicFileChange}
-                  style={{ display: 'none' }}
-                />
+                {!newProfilePic && (
+                  <>
+                    <label
+                      htmlFor="file-upload"
+                      className="relative custom-file-upload flex rounded-full p-0 cursor-pointer group">
+                      <Image
+                        src={pfp}
+                        alt="profile picture"
+                        width={75}
+                        height={75}
+                        className="rounded-full transition-all duration-300 brightness-100 group-hover:brightness-75 pointer-events-none"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto rounded-full">
+                        <FaPencil className="text-white text-xl" />
+                      </div>
+                    </label>
+
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePicFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </>
+                )}
                 {/* Image preview */}
 
                 {profilePicSource && (
@@ -491,30 +462,6 @@ const Layout = ({ children }) => {
                 )}
               </div>
             </div>
-            {!profilePicSource && (
-              <div className="profile-pic-link mb-5">
-                <h3 className="user-settings-description">Or use an image link</h3>
-                <div className="link-container flex flex-row justify-center">
-                  <input
-                    type="text"
-                    value={profilePicSourceInput}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleProfilePicSourceSubmit()
-                    }}
-                    onChange={(e) => {
-                      setProfilePicSourceInput(e.target.value)
-                    }}
-                    placeholder="Enter image URL"
-                    className="rounded-xl px-3 border border-black h-10"
-                  />
-                  <button
-                    onClick={handleProfilePicSourceSubmit}
-                    className="link-upload-btn bg-blue-500 hover:bg-blue-700 h-10 rounded-xl px-2">
-                    <IoIosCloudUpload size={20} />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

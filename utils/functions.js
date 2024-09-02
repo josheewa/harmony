@@ -86,4 +86,23 @@ const groupMessagesByDate = (messages) => {
   return finalGroups;
 };
 
-export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate }
+const isImageLinkValid = async (url) => {
+  try {
+    const response = await fetch(url)
+    const contentType = response.headers.get('content-type')
+    return contentType && contentType.startsWith('image')
+  } catch (error) {
+    console.error('Error validating image link:', error)
+    return false
+  }
+}
+
+const isValidURL = (url) => {
+  const urlPattern = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-zA-Z\\d])([a-zA-Z\\d-])*[a-zA-Z\\d])\\.)+([a-zA-Z]{2,6})(\\/[^\\s]*)?$'
+  )
+  return urlPattern.test(url)
+}
+
+export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate, isImageLinkValid, isValidURL }
