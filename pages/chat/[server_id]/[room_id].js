@@ -6,7 +6,12 @@ import { IoMdSend, IoMdRefresh } from 'react-icons/io'
 import { MdError } from 'react-icons/md'
 import { FaHashtag } from 'react-icons/fa'
 import Loading from '@/components/Loading'
-import { convertTimestamp, formatDateLabel, groupMessagesByDate } from '@/utils/functions'
+import {
+  convertTimestamp,
+  formatDateLabel,
+  groupMessagesByDate,
+  subGroupMessagesByDate,
+} from '@/utils/functions'
 import {
   MESSAGES_SUBSCRIPTION,
   SEND_MESSAGE,
@@ -19,7 +24,6 @@ import Image from 'next/image'
 import { useUserData } from '@/components/InfoProvider'
 
 export default function ChatRoom() {
-  // const { user, isLoading } = useUser()
   const router = useRouter()
   const { room_id, server_id } = router.query
   const [messages, setMessages] = useState([])
@@ -104,7 +108,6 @@ export default function ChatRoom() {
   const user_id = userData.id
   const username = userData.username
   const pfp = userData.pfp
-  // let username = user?.['harmony/username']
 
   const [sendMessage] = useMutation(SEND_MESSAGE)
 
@@ -164,7 +167,8 @@ export default function ChatRoom() {
   }
 
   const groupedMessages = groupMessagesByDate(messages) // Group messages after sorting
-
+  const subGroupedMessages = subGroupMessagesByDate(messages)
+  console.log(groupedMessages)
   // console.log(groupedMessages)
   useEffect(() => {
     if (!initialLoad && inView && hasMore && !isFetching) {
@@ -193,68 +197,88 @@ export default function ChatRoom() {
 
           <div className="messages-container flex flex-col-reverse overflow-auto justify-start h-full">
             <div ref={messagesEndRef}></div>
-            {/* Iterate over date groups */}
-            {groupedMessages.map((dateGroup, dateIndex) => (
-              <div key={dateIndex} className="date-group flex flex-col-reverse">
-                {/* Iterate over subgroups within each date group */}
-                {dateGroup.groups.map((subGroup, subGroupIndex) => (
-                  <div
-                    key={subGroupIndex}
-                    className="subgroup-container flex flex-row items-start p-2 bg-gray-100 my-[0.5px] rounded-lg">
-                    {/* Display profile picture and username for the subgroup */}
-                    <div className="message-pfp mr-4">
-                      {!subGroup[0].user.pfp && <UserPfp username={subGroup[0].user.username} />}
-                      {subGroup[0].user.pfp && (
-                        <Image
-                          src={`${subGroup[0].user.pfp}`}
-                          alt="profile picture"
-                          width={40}
-                          height={40}
-                          className="chat-pfp rounded-full"
-                        />
-                      )}
-                    </div>
-
-                    {/* Messages Container for the Subgroup */}
-                    <div className="messages-content flex flex-col">
-                      {/* Display Username and Timestamp once for the entire subgroup */}
-                      <div className="message-header">
-                        <span className="username font-bold">{subGroup[0].user.username}</span>
-                        <span className="timestamp mx-2 text-gray-600 text-xs">
-                          {convertTimestamp(subGroup[0].timestamp)}
-                        </span>
-                      </div>
-                      <div className="submessages flex flex-col-reverse">
-                        {/* Display all messages in the subgroup */}
-                        {subGroup.map((message, messageIndex) => (
-                          <div key={messageIndex} className="message-text mb-1">
-                            {message.message_text}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* If any message failed, show the retry button for the entire subgroup */}
-                      {subGroup.some((message) => message.failed) && (
-                        <span className="message-fail-banner flex flex-row items-center text-red-500 mt-2">
-                          <MdError />
-                          <span className="mx-2">
-                            Some messages failed to send. Please try again.
-                          </span>
-                          <button
-                            onClick={() => handleReSendMessage(subGroup)}
-                            className="resend-button text-black mx-2 border-none flex flex-row bg-gray-300 px-2 p-1 rounded-lg items-center hover:bg-gray-400">
-                            Retry
-                            <IoMdRefresh size={20} />
-                          </button>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+            {groupedMessages.map((group, index) => (
+              <div key={index} className="message-group flex flex-col">
                 {/* Date separator for each group */}
                 <div className="date-separator flex items-center text-center w-full text-gray-400 text-sm my-2">
-                  {formatDateLabel(dateGroup.date)}
+                  {formatDateLabel(group.date)}
                 </div>
+                {group.messages
+                  .slice() // Create a shallow copy of the array
+                  .reverse() // Reverse the order of messages
+                  .map((message, msgIndex, reversedMessages) => {
+                    const previousMessage = reversedMessages[msgIndex - 1]
+                    const isSameUserAsPrevious =
+                      msgIndex > 0 &&
+                      previousMessage.user.username === message.user.username &&
+                      new Date(message.timestamp).toDateString() ===
+                        new Date(previousMessage.timestamp).toDateString() &&
+                      new Date(message.timestamp).getTime() -
+                        new Date(previousMessage.timestamp).getTime() <=
+                        5 * 60 * 1000
+
+                    const end = reversedMessages.length - 1
+
+                    return (
+                      <div
+                        key={msgIndex}
+                        className={`message-wrapper flex items-start bg-gray-100 hover:bg-gray-300 group rounded-lg relative p-1`}>
+                        {/* Display Profile Picture or Timestamp to the left */}
+                        {isSameUserAsPrevious ? (
+                          <div className="sub-timestamps flex items-center justify-end w-20 h-full opacity-0 mr-2 group-hover:opacity-100 text-xs text-gray-600">
+                            {convertTimestamp(message.timestamp)}
+                          </div>
+                        ) : (
+                          <div className="message-pfp w-20 flex justify-center mr-2">
+                            {!message.user.pfp && <UserPfp username={message.user.username} />}
+                            {message.user.pfp && (
+                              <Image
+                                src={`${message.user.pfp}`}
+                                alt="profile picture"
+                                width={40}
+                                height={40}
+                                className="chat-pfp rounded-full"
+                              />
+                            )}
+                          </div>
+                        )}
+                        <div className="messages-content flex flex-col w-full">
+                          {/* Display Username and Timestamp for the First Message in a Group */}
+                          {!isSameUserAsPrevious && (
+                            <div className="message-header flex items-center">
+                              <span className="username font-bold">{message.user.username}</span>
+                              <span className="timestamp mx-2 text-gray-600 text-xs">
+                                {convertTimestamp(message.timestamp)}
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="message-body flex bg-gray-40">
+                            <span
+                              className={`message-text flex-1 ${!isSameUserAsPrevious && 'mt-1'}`}>
+                              {message.message_text}
+                            </span>
+                          </div>
+
+                          {/* Display retry option if the message failed */}
+                          {message.failed && (
+                            <span className="message-fail-banner flex flex-row items-center text-red-500 mt-2">
+                              <MdError />
+                              <span className="mx-2">
+                                Message failed to send. Please try again.
+                              </span>
+                              <button
+                                onClick={() => handleReSendMessage(message)}
+                                className="resend-button text-black mx-2 border-none flex flex-row bg-gray-300 px-2 p-1 rounded-lg items-center hover:bg-gray-400">
+                                Retry
+                                <IoMdRefresh size={20} />
+                              </button>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
               </div>
             ))}
 
@@ -266,7 +290,6 @@ export default function ChatRoom() {
                 <h2>This is the start of the #{roomName} room.</h2>
               </div>
             )}
-
             <div ref={topRef}></div>
           </div>
 

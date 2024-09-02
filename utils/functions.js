@@ -46,7 +46,7 @@ const formatDateLabel = (dateString) => {
 }
 
 // Group messages by date and return an array of grouped messages
-const groupMessagesByDate = (messages) => {
+const subGroupMessagesByDate = (messages) => {
   const groupedMessages = new Map(); // Use a Map for efficient lookups
 
   // Group messages by date
@@ -86,6 +86,29 @@ const groupMessagesByDate = (messages) => {
   return finalGroups;
 };
 
+
+ // Group messages by date and return an array of grouped messages
+ const groupMessagesByDate = (messages) => {
+  const groupedMessages = []
+
+  messages.forEach((message) => {
+    const messageDate = new Date(message.timestamp).toDateString()
+
+    // Check if a group with the current date already exists
+    const existingGroup = groupedMessages.find((group) => group.date === messageDate)
+
+    if (existingGroup) {
+      // Add the message to the existing group
+      existingGroup.messages.push(message)
+    } else {
+      // Create a new group for the current date
+      groupedMessages.push({ date: messageDate, messages: [message] })
+    }
+  })
+
+  return groupedMessages
+}
+
 const isImageLinkValid = async (url) => {
   try {
     const response = await fetch(url)
@@ -105,4 +128,4 @@ const isValidURL = (url) => {
   return urlPattern.test(url)
 }
 
-export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate, isImageLinkValid, isValidURL }
+export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate, isImageLinkValid, isValidURL, subGroupMessagesByDate }

@@ -403,9 +403,9 @@ const Layout = ({ children }) => {
             <span className="close" onClick={handleSettingsClose}>
               &times;
             </span>
-            <h2 className="modal-title">User Settings</h2>
+            <h2 className="modal-title">Edit User Profile</h2>
             <div className="profile-pic-upload mb-5">
-              <div className="upload-container flex flex-col items-center justify-center;">
+              <div className="upload-container flex flex-col items-center justify-center">
                 {!newProfilePic && (
                   <>
                     <label
@@ -416,10 +416,10 @@ const Layout = ({ children }) => {
                         alt="profile picture"
                         width={75}
                         height={75}
-                        className="rounded-full transition-all duration-300 brightness-100 group-hover:brightness-75 pointer-events-none"
+                        className="rounded-full transition-all duration-300 brightness-100 group-hover:brightness-50 pointer-events-none"
                       />
                       <div className="absolute inset-0 flex items-center justify-center w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto rounded-full">
-                        <FaPencil className="text-white text-xl" />
+                        <FaPencil className="text-white text-2xl" />
                       </div>
                     </label>
 
@@ -430,6 +430,7 @@ const Layout = ({ children }) => {
                       onChange={handleProfilePicFileUpload}
                       style={{ display: 'none' }}
                     />
+                    <span className='username-label text-xl'>{username}</span>
                   </>
                 )}
                 {/* Image preview */}
@@ -442,7 +443,7 @@ const Layout = ({ children }) => {
                       alt="Profile Picture Preview"
                       width={100}
                       height={100}
-                      className="rounded-full mt-3 h-32 w-32 object-cover;"
+                      className="rounded-full mt-3 h-32 w-32 object-cover"
                     />
                   </div>
                 )}
