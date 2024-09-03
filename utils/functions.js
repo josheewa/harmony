@@ -45,48 +45,6 @@ const formatDateLabel = (dateString) => {
   }
 }
 
-// Group messages by date and return an array of grouped messages
-const subGroupMessagesByDate = (messages) => {
-  const groupedMessages = new Map(); // Use a Map for efficient lookups
-
-  // Group messages by date
-  messages.forEach((message) => {
-    const messageDate = new Date(message.timestamp).toDateString();
-
-    if (!groupedMessages.has(messageDate)) {
-      groupedMessages.set(messageDate, []);
-    }
-
-    groupedMessages.get(messageDate).push(message);
-  });
-
-  // Process grouped messages into subgroups
-  const finalGroups = Array.from(groupedMessages.entries()).map(([date, msgs]) => {
-    const currentDateGroup = [];
-    let tempGroup = [msgs[0]]; // Start with the first message
-
-    for (let i = 1; i < msgs.length; i++) {
-      // If the current message is by the same user and within 5 minutes of the previous message
-      if (
-        msgs[i].user_id === msgs[i - 1].user_id &&
-        new Date(msgs[i].timestamp).getTime() - new Date(msgs[i - 1].timestamp).getTime() <= 5 * 60 * 1000
-      ) {
-        tempGroup.push(msgs[i]);
-      } else {
-        currentDateGroup.push(tempGroup);
-        tempGroup = [msgs[i]]; // Start a new subgroup
-      }
-    }
-
-    currentDateGroup.push(tempGroup); // Add the last group
-
-    return { date, groups: currentDateGroup }; // Include date in the final structure
-  });
-
-  return finalGroups;
-};
-
-
  // Group messages by date and return an array of grouped messages
  const groupMessagesByDate = (messages) => {
   const groupedMessages = []
@@ -128,4 +86,4 @@ const isValidURL = (url) => {
   return urlPattern.test(url)
 }
 
-export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate, isImageLinkValid, isValidURL, subGroupMessagesByDate }
+export { generate8CharId, convertTimestamp, formatDateLabel, groupMessagesByDate, isImageLinkValid, isValidURL }

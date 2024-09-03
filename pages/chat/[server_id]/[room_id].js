@@ -10,7 +10,6 @@ import {
   convertTimestamp,
   formatDateLabel,
   groupMessagesByDate,
-  subGroupMessagesByDate,
 } from '@/utils/functions'
 import {
   MESSAGES_SUBSCRIPTION,
@@ -167,9 +166,6 @@ export default function ChatRoom() {
   }
 
   const groupedMessages = groupMessagesByDate(messages) // Group messages after sorting
-  const subGroupedMessages = subGroupMessagesByDate(messages)
-  console.log(groupedMessages)
-  // console.log(groupedMessages)
   useEffect(() => {
     if (!initialLoad && inView && hasMore && !isFetching) {
       setIsFetching(true)
