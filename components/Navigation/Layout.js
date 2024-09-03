@@ -378,16 +378,17 @@ const Layout = ({ children }) => {
         )}
 
         <div className="user-info-pane bottom-0 absolute flex flex-row items-center bg-gray-900 w-56 p-3">
-          {pfp && (
+          {pfp ? (
             <Image
-              className="user-info-pfp rounded-full"
+              className="user-info-pfp rounded-full shadow-gray-500 shadow-sm"
               src={pfp}
               alt={username}
               width={40}
               height={40}
             />
+          ) : (
+            <UserPfp username={username} />
           )}
-          {!pfp && <UserPfp username={username} />}
           <h2>{username.length > 8 ? username.slice(0, 8) + '...' : username}</h2>
           <button
             className="user-settings-button text-gray-200 hover:text-gray-500 cursor-pointer"
@@ -410,16 +411,18 @@ const Layout = ({ children }) => {
                   <>
                     <label
                       htmlFor="file-upload"
-                      className="relative custom-file-upload flex rounded-full p-0 cursor-pointer group">
-                      <Image
-                        src={pfp}
-                        alt="profile picture"
-                        width={75}
-                        height={75}
-                        className="rounded-full transition-all duration-300 brightness-100 group-hover:brightness-50 pointer-events-none"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto rounded-full">
-                        <FaPencil className="text-white text-2xl" />
+                      className="relative custom-file-upload flex rounded-full p-0 cursor-pointer">
+                      <div className="relative flex group rounded-full justify-center items-center shadow-gray-400 shadow-lg w-[75px] h-[75px] box-border">
+                        <Image
+                          src={pfp}
+                          alt="profile picture"
+                          width={75}
+                          height={75}
+                          className="rounded-full transition-all duration-300 filter brightness-100 group-hover:brightness-50 group-hover:saturate-50 pointer-events-none"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto rounded-full bg-black bg-opacity-50">
+                          <FaPencil className="text-white text-2xl" />
+                        </div>
                       </div>
                     </label>
 
@@ -428,13 +431,13 @@ const Layout = ({ children }) => {
                       type="file"
                       accept="image/*"
                       onChange={handleProfilePicFileUpload}
-                      style={{ display: 'none' }}
+                      className="hidden"
                     />
-                    <span className='username-label text-xl'>{username}</span>
+                    <span className="username-label text-xl">{username}</span>
                   </>
                 )}
-                {/* Image preview */}
 
+                {/* Image preview */}
                 {profilePicSource && (
                   <div className="profile-pic-preview mt-3 text-center p-3">
                     Preview:
@@ -443,10 +446,11 @@ const Layout = ({ children }) => {
                       alt="Profile Picture Preview"
                       width={100}
                       height={100}
-                      className="rounded-full mt-3 h-32 w-32 object-cover"
+                      className="rounded-full mt-3 h-32 w-32 object-cover  shadow-gray-400 shadow-lg"
                     />
                   </div>
                 )}
+
                 {profilePicSource && (
                   <span className="pfp-menu-btns flex flex-row w-full justify-center items-center">
                     <button
