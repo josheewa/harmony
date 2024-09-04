@@ -279,7 +279,7 @@ const Layout = ({ children }) => {
               href={`/chat/${server_id}${
                 router.query.server_id === server_id ? `/${router.query.room_id}` : ''
               }`}
-              className="server-nav-item sidebar-server-icon bg-white rounded-full">
+              className="server-nav-item sidebar-server-icon bg-white hover:bg-gray-500 rounded-[100%] hover:rounded-[30%] transition-all duration-300 ease-in-out">
               <ServerIcon key={server_id} serverName={server.server_name} serverId={server_id} />
             </Link>
           ))}

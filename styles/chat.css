@@ -21,6 +21,44 @@
   .failed {
     animation: shake-animation 0.5s ease;
   }
+
+  @keyframes server-hover-in {
+    from {
+      border-radius: 9999px;
+    }
+    50% {
+      border-radius: 50px;
+    }
+    to {
+      border-radius: 20px;
+    }
+  }
+  
+  @keyframes server-hover-out {
+    from {
+      border-radius: 20px;
+    }
+    50% {
+      border-radius: 50px;
+    }
+    to {
+      border-radius: 9999px;
+    }
+  }
+  
+  .animated-border-radius {
+    border-radius: 9999px; /* Start fully rounded */
+    animation: server-hover-out 0.5s ease-in-out forwards;
+  }
+  
+  .animated-border-radius.hovered {
+    animation: server-hover-out 0.5s ease-in-out forwards;
+  }
+  
+  .animated-border-radius:hover {
+    animation: server-hover-in 0.6s ease-in-out forwards;
+  }
+  
   @keyframes shake-animation {
     0% {
       transform: translateX(0);

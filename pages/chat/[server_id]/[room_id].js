@@ -6,11 +6,7 @@ import { IoMdSend, IoMdRefresh } from 'react-icons/io'
 import { MdError } from 'react-icons/md'
 import { FaHashtag } from 'react-icons/fa'
 import Loading from '@/components/Loading'
-import {
-  convertTimestamp,
-  formatDateLabel,
-  groupMessagesByDate,
-} from '@/utils/functions'
+import { convertTimestamp, formatDateLabel, groupMessagesByDate } from '@/utils/functions'
 import {
   MESSAGES_SUBSCRIPTION,
   SEND_MESSAGE,
@@ -128,7 +124,7 @@ export default function ChatRoom() {
           variables: {
             message_text: inputText,
             room_id,
-            user_id,
+            user_id: '',
           },
         })
       } catch (error) {
@@ -192,6 +188,7 @@ export default function ChatRoom() {
           </div>
 
           <div className="messages-container flex flex-col-reverse overflow-auto justify-start h-full">
+
             <div ref={messagesEndRef}></div>
             {groupedMessages.map((group, index) => (
               <div key={index} className="message-group flex flex-col">
@@ -212,8 +209,6 @@ export default function ChatRoom() {
                       new Date(message.timestamp).getTime() -
                         new Date(previousMessage.timestamp).getTime() <=
                         5 * 60 * 1000
-
-                    const end = reversedMessages.length - 1
 
                     return (
                       <div
@@ -258,7 +253,7 @@ export default function ChatRoom() {
 
                           {/* Display retry option if the message failed */}
                           {message.failed && (
-                            <span className="message-fail-banner flex flex-row items-center text-red-500 mt-2">
+                            <span className="message-fail-banner flex flex-row items-center text-red-500 mt-2 failed">
                               <MdError />
                               <span className="mx-2">
                                 Message failed to send. Please try again.
