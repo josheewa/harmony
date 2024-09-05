@@ -182,13 +182,12 @@ export default function ChatRoom() {
       </Head>
       <main className="relative">
         <div className="chat-wrapper flex flex-col h-screen">
-          <div className="chat-header flex flex-row sticky items-center text-2xl justify-center w-full bg-gray-700 text-white py-6">
+          <div className="chat-header flex flex-row justify-center sticky items-center text-2xl w-full bg-gray-700 text-white py-6">
             <FaHashtag />
             {`${roomName}`}
           </div>
 
           <div className="messages-container flex flex-col-reverse overflow-auto justify-start h-full">
-
             <div ref={messagesEndRef}></div>
             {groupedMessages.map((group, index) => (
               <div key={index} className="message-group flex flex-col">
@@ -284,21 +283,23 @@ export default function ChatRoom() {
             <div ref={topRef}></div>
           </div>
 
-          <div className="input-container bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1 border border-gray-300">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={`Message #${roomName}`}
-              className="input-field border-none outline-none bg-transparent w-full text-lg p-2 text-white placeholder:text-gray-50"
-            />
-            <button
-              onClick={handleMessageSend}
-              className="send-button bg-transparent rounded-full px-3 text-gray-50 hover:text-gray-800">
-              <IoMdSend size={20} />
-            </button>
-          </div>
+          {room_id != 'PHkbABjm' && (
+            <div className="input-container bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1 border border-gray-300">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={`Message #${roomName}`}
+                className="input-field border-none outline-none bg-transparent w-full text-lg p-2 text-white placeholder:text-gray-50"
+              />
+              <button
+                onClick={handleMessageSend}
+                className="send-button bg-transparent rounded-full px-3 text-gray-50 hover:text-gray-800">
+                <IoMdSend size={20} />
+              </button>
+            </div>
+          )}
         </div>
       </main>
     </>

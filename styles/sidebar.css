@@ -60,4 +60,7 @@
   .upload-container button {
     @apply p-3 mt-3 rounded-md;
   }
+  .sidebar-tooltip {
+    @apply absolute w-auto p-2 m-3 min-w-max left-16 rounded-md shadow-md text-white bg-gray-600 text-xs transition-all duration-100 scale-0 origin-left;
+  }
 }
