@@ -124,7 +124,7 @@ export default function ChatRoom() {
           variables: {
             message_text: inputText,
             room_id,
-            user_id: '',
+            user_id,
           },
         })
       } catch (error) {
