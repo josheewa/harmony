@@ -283,7 +283,7 @@ export default function ChatRoom() {
             <div ref={topRef}></div>
           </div>
 
-          {room_id != 'asd' && (
+          {room_id != 'PHkbABjm' && (
             <div className="input-container bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1 border border-gray-300">
               <input
                 type="text"
