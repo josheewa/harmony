@@ -23,15 +23,23 @@ const Home = () => {
     <>
       {!user && !isLoading ? (
         <div className="home-container">
-          <h1 className="home-title">Welcome to Harmony!</h1>
-          <div className="home-banner">
-            <p className="home-blurb">Connect with friends and the world around you on Harmony.</p>
+          <div className="home-content">
+            <h1 className="home-title">Welcome to Harmony!</h1>
+            <div className="home-banner">
+              <p className="home-blurb">Connect with friends and the world around you on Harmony.</p>
+            </div>
+            <div className="home-auth-container">
+              <Link
+                href="/api/auth/login"
+                className="discord-login-btn">
+                <AiOutlineLogin size={20} className="mr-2" />
+                Login
+              </Link>
+              <p className="text-white/80 text-sm mt-4">
+                Join millions of users worldwide
+              </p>
+            </div>
           </div>
-          <Link
-            href="/api/auth/login"
-            className="flex items-center text-white py-2 px-4 rounded-full mb-4 hover:bg-opacity-75 bg-cyan-500 hover:bg-cyan-700">
-            Login <AiOutlineLogin size={20} className="ml-1" />
-          </Link>
         </div>
       ) : (
         <Loading />

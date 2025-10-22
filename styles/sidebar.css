@@ -2,7 +2,19 @@
 
 @layer components {
   .server-nav-item {
-    @apply mb-5;
+    @apply mb-5 transition-all duration-200;
+  }
+  
+  .server-nav-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .fa-icon {
+    @apply transition-colors duration-200;
+  }
+  
+  .fa-icon:hover {
+    @apply text-blue-400;
   }
   .dropdown-content {
     @apply z-10 right-0 top-8 w-32 absolute bg-white text-left;

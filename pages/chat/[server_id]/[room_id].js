@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useSubscription, useMutation, useQuery } from '@apollo/client'
 import Head from 'next/head'
 import { IoMdSend, IoMdRefresh } from 'react-icons/io'
+import { FaPaperPlane } from 'react-icons/fa'
 import { MdError } from 'react-icons/md'
 import { FaHashtag } from 'react-icons/fa'
 import Loading from '@/components/Loading'
@@ -212,7 +213,7 @@ export default function ChatRoom() {
                     return (
                       <div
                         key={msgIndex}
-                        className={`message-wrapper flex items-start bg-gray-100 hover:bg-gray-300 group rounded-lg relative p-1`}>
+                        className={`message-wrapper flex items-start hover:bg-gray-100 group rounded-lg relative p-1 transition-colors`}>
                         {/* Display Profile Picture or Timestamp to the left */}
                         {isSameUserAsPrevious ? (
                           <div className="sub-timestamps flex items-center justify-end w-20 h-full opacity-0 mr-2 group-hover:opacity-100 text-xs text-gray-600">
@@ -284,19 +285,19 @@ export default function ChatRoom() {
           </div>
 
           {room_id != 'PHkbABjm' && (
-            <div className="input-container bottom-0 flex mt-auto p-2 bg-gray-500 rounded-e-full rounded-s-lg m-1 border border-gray-300">
+            <div className="input-container bottom-0 flex mt-auto p-3 bg-white rounded-2xl mx-4 mb-4 border border-gray-200 shadow-lg">
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={`Message #${roomName}`}
-                className="input-field border-none outline-none bg-transparent w-full text-lg p-2 text-white placeholder:text-gray-50"
+                className="input-field border-none outline-none bg-transparent w-full text-lg p-2 text-gray-800"
               />
               <button
                 onClick={handleMessageSend}
-                className="send-button bg-transparent rounded-full px-3 text-gray-50 hover:text-gray-800">
-                <IoMdSend size={20} />
+                className="send-button bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-full px-4 py-2 text-white transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95">
+                <FaPaperPlane size={18} />
               </button>
             </div>
           )}

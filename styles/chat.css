@@ -16,7 +16,7 @@
     @apply border-none outline-none bg-transparent w-full text-lg p-2 text-white;
   }
   .input-field::placeholder {
-    @apply text-gray-50;
+    @apply text-gray-600;
   }
   .failed {
     animation: shake-animation 0.5s ease;

@@ -6,6 +6,7 @@ import { FaSquarePlus, FaPencil } from 'react-icons/fa6'
 import { RiLogoutBoxLine } from 'react-icons/ri'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 import { IoMdClose, IoMdSettings, IoIosCloudUpload } from 'react-icons/io'
+import { FaHouse } from 'react-icons/fa6'
 import ServerIcon from '../ServerIcon'
 import { useQuery, useMutation } from '@apollo/client'
 import {
@@ -270,8 +271,11 @@ const Layout = ({ children }) => {
     <div className="sidebar-container h-screen w-full flex fixed">
       {isChatPath && (
         <div className="server-nav-panel relative w-20 bg-gray-900 flex text-white text-center flex-col items-center justify-start p-3">
-          <Link href="/chat/dashboard" className="server-nav-item">
-            <FaHome size={35} className="fa-icon" />
+          <Link href="/chat/dashboard" className="server-nav-item group">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+              <FaHouse size={20} className="text-white" />
+            </div>
+            <span className="sidebar-tooltip group-hover:scale-100">Home</span>
           </Link>
           {servers.map(({ server_id, server }) => (
             <Link
@@ -284,14 +288,17 @@ const Layout = ({ children }) => {
               <span class="sidebar-tooltip group-hover:scale-100">{server.server_name}</span>
             </Link>
           ))}
-          <button className="new-server-button" onClick={() => setIsCreatingServer(true)}>
-            <FaSquarePlus size={40} />
+          <button 
+            className="new-server-button p-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 text-gray-400 hover:text-white" 
+            onClick={() => setIsCreatingServer(true)}
+            title="Create Server">
+            <FaSquarePlus size={24} />
           </button>
           <Link
             href="/api/auth/logout"
-            className="sidebar-logout absolute bottom-0 server-nav-item text-red-500"
+            className="sidebar-logout absolute bottom-0 server-nav-item text-gray-400 hover:text-red-400 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-800"
             title="Logout">
-            <RiLogoutBoxLine size={40} />
+            <RiLogoutBoxLine size={24} />
           </Link>
         </div>
       )}
@@ -299,19 +306,19 @@ const Layout = ({ children }) => {
       <div className="second-nav-panel w-56 bg-gray-800 text-white text-center overflow-y-auto py-3">
         {isInServer && (
           <>
-            <div className="sidebar-server-name font-bold text-xl my-5">{serverName}</div>
-            <div className="sidebar-rooms-wrapper bg-gray-700 rounded-lg">
+            <div className="sidebar-server-name font-bold text-xl my-5 text-white">{serverName}</div>
+            <div className="sidebar-rooms-wrapper bg-gray-700 rounded-xl shadow-lg border border-gray-600">
               {rooms &&
                 rooms.map(({ room_id, room }) => (
                   <div className="room-link-container flex flex-row" key={room_id}>
                     <Link
                       href={`/chat/${server_id}/${room_id}`}
-                      className={`sidebar-rooms bg-gray-700 h-full w-full text-left px-3 py-2 text-gray-200 flex flex-row justify-between rounded-lg hover:bg-gray-800 ${
-                        room_id === router.query.room_id ? 'current-room' : ''
+                      className={`sidebar-rooms bg-gray-700 h-full w-full text-left px-3 py-3 text-gray-200 flex flex-row justify-between rounded-xl hover:bg-gray-600 transition-all duration-200 group ${
+                        room_id === router.query.room_id ? 'current-room bg-gray-600 shadow-inner' : ''
                       }`}>
-                      <div className="room-nametext-gray-200 flex flex-row items-center">
-                        <FaHashtag />
-                        {room.room_name}
+                      <div className="room-nametext-gray-200 flex flex-row items-center font-medium">
+                        <FaHashtag className="text-gray-400 mr-2" />
+                        <span className="text-gray-200 group-hover:text-white transition-colors">{room.room_name}</span>
                       </div>
                       <div className="more-button-container relative items-center flex px-1 text-white hover:text-gray-400">
                         <button className="more-button" onClick={() => toggleDropdown(room_id)}>
@@ -348,10 +355,11 @@ const Layout = ({ children }) => {
               </div>
             ) : (
               <button
-                className="create-room-button flex w-52 justify-center bg-gray-700 py-2 rounded-full mx-2 my-2"
+                className="create-room-button flex w-52 justify-center items-center bg-gray-700 hover:bg-gray-600 py-2 rounded-lg mx-2 my-2 text-white font-medium transition-colors duration-200"
                 onClick={handleCreateRoomClick}
                 title="Create a new room">
-                <FaPlus />
+                <FaPlus className="mr-2" />
+                Create Room
               </button>
             )}
           </>
@@ -378,7 +386,7 @@ const Layout = ({ children }) => {
           </div>
         )}
 
-        <div className="user-info-pane bottom-0 absolute flex flex-row items-center bg-gray-900 w-56 p-3">
+        <div className="user-info-pane bottom-0 absolute flex flex-row items-center bg-gray-900 w-56 p-4 border-t border-gray-700">
           {pfp ? (
             <Image
               className="user-info-pfp rounded-full shadow-gray-500 shadow-sm"
@@ -390,9 +398,9 @@ const Layout = ({ children }) => {
           ) : (
             <UserPfp username={username} />
           )}
-          <h2>{username.length > 8 ? username.slice(0, 8) + '...' : username}</h2>
+          <h2 className="text-gray-200 font-medium">{username.length > 8 ? username.slice(0, 8) + '...' : username}</h2>
           <button
-            className="user-settings-button text-gray-200 hover:text-gray-500 cursor-pointer"
+            className="user-settings-button text-gray-400 hover:text-white cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-gray-800"
             onClick={handleSettingsClick}>
             <IoMdSettings size={20} />
           </button>
