@@ -45,7 +45,7 @@ export default function ChatRoom() {
     error: checkPermissionsError,
   } = useQuery(CHECK_USER_SERVER_PERMISSIONS, {
     variables: { user_id: userData.id, server_id },
-    skip: !userData, // Skip the query if user is not loaded
+    skip: !userData || server_id === 'FMxYU3ZF', // Skip the query if user is not loaded or demo server
   })
 
   const { error: subsError, loading: subsLoading } = useSubscription(MESSAGES_SUBSCRIPTION, {
@@ -54,6 +54,7 @@ export default function ChatRoom() {
       limit,
       offset,
     },
+    skip: false, // Enable subscription for all servers including demo
     onData: ({ data: subscriptionData }) => {
       if (subscriptionData) {
         const newMessages = subscriptionData.data.messages
@@ -82,10 +83,14 @@ export default function ChatRoom() {
   })
 
   useEffect(() => {
+    // Allow access to demo server without permission check
+    if (server_id === 'FMxYU3ZF') {
+      return
+    }
     if (checkPermissionsData && checkPermissionsData.user_servers.length === 0) {
       router.push('/unauthorized')
     }
-  }, [checkPermissionsData, router])
+  }, [checkPermissionsData, router, server_id])
 
   useEffect(() => {
     if (room_id) {

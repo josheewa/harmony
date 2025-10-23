@@ -24,7 +24,7 @@ export default function ServerHome() {
     error: checkPermissionsError,
   } = useQuery(CHECK_USER_SERVER_PERMISSIONS, {
     variables: { user_id: userData.id, server_id },
-    skip: !userData, // Skip the query if user is not loaded
+    skip: !userData || server_id === 'FMxYU3ZF', // Skip the query if user is not loaded or demo server
   })
 
   useEffect(() => {
@@ -45,13 +45,17 @@ export default function ServerHome() {
   }, [rooms, router, server_id])
 
   useEffect(() => {
+    // Allow access to demo server without permission check
+    if (server_id === 'FMxYU3ZF') {
+      return
+    }
     if (checkPermissionsData && checkPermissionsData.user_servers.length === 0) {
       router.push('/unauthorized')
     }
-  }, [checkPermissionsData, router])
+  }, [checkPermissionsData, router, server_id])
 
-  if (getServerRoomsLoading || userLoading || checkPermissionsLoading) return <Loading />
-  if (userError || checkPermissionsError)
+  if (getServerRoomsLoading || userLoading || (checkPermissionsLoading && server_id !== 'FMxYU3ZF')) return <Loading />
+  if (userError || (checkPermissionsError && server_id !== 'FMxYU3ZF'))
     return <div>{(userError || checkPermissionsError).message}</div>
 
   return <></>

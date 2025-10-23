@@ -17,6 +17,7 @@ import {
   CREATE_NEW_ROOM,
   CREATE_NEW_SERVER,
   UPDATE_USER_PROFILE_PICTURE,
+  ADD_USER_TO_DEMO_SERVER,
 } from '@/utils/Apollo/queries'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
@@ -63,7 +64,33 @@ const Layout = ({ children }) => {
 
   const [dropdownVisible, setDropdownVisible] = useState(null)
 
+  // Mutation handlers
+  const [deleteRoom] = useMutation(DELETE_ROOM)
+  const [createRoom] = useMutation(CREATE_NEW_ROOM)
+  const [createServer] = useMutation(CREATE_NEW_SERVER)
+  const [updateUserProfilePicture] = useMutation(UPDATE_USER_PROFILE_PICTURE)
+  const [addUserToDemoServer] = useMutation(ADD_USER_TO_DEMO_SERVER)
+
   // Effects
+  // Auto-add user to demo server if not already added
+  useEffect(() => {
+    if (getUserServersData && user_id) {
+      const hasDemoServer = getUserServersData.user_servers.some(
+        (userServer) => userServer.server_id === 'FMxYU3ZF'
+      )
+      
+      if (!hasDemoServer) {
+        // Automatically add user to demo server
+        addUserToDemoServer({
+          variables: { user_id },
+          refetchQueries: [{ query: GET_USER_SERVERS, variables: { user_id } }],
+        }).catch((error) => {
+          console.log('User already added to demo server or error occurred:', error)
+        })
+      }
+    }
+  }, [getUserServersData, user_id, addUserToDemoServer])
+
   // Fetch user servers
   useEffect(() => {
     if (getUserServersData) {
@@ -104,12 +131,6 @@ const Layout = ({ children }) => {
   if (serverNameData && serverNameData.servers && serverNameData.servers.length > 0) {
     serverName = serverNameData.servers[0].server_name
   }
-
-  // Mutation handlers
-  const [deleteRoom] = useMutation(DELETE_ROOM)
-  const [createRoom] = useMutation(CREATE_NEW_ROOM)
-  const [createServer] = useMutation(CREATE_NEW_SERVER)
-  const [updateUserProfilePicture] = useMutation(UPDATE_USER_PROFILE_PICTURE)
 
   // Function handlers
   const toggleDropdown = (roomId) => {

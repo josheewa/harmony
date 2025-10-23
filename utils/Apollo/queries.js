@@ -144,6 +144,13 @@ const CHECK_USER_SERVER_PERMISSIONS = gql`
     }
   }
 `
+const ADD_USER_TO_DEMO_SERVER = gql`
+  mutation AddUserToDemoServer($user_id: uuid!) {
+    insert_user_servers_one(object: { user_id: $user_id, server_id: "FMxYU3ZF" }) {
+      id
+    }
+  }
+`
 
 export {
   MESSAGES_SUBSCRIPTION,
@@ -159,5 +166,6 @@ export {
   LEAVE_SERVER,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE_PICTURE,
-  CHECK_USER_SERVER_PERMISSIONS
+  CHECK_USER_SERVER_PERMISSIONS,
+  ADD_USER_TO_DEMO_SERVER
 }

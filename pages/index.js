@@ -35,9 +35,6 @@ const Home = () => {
                 <AiOutlineLogin size={20} className="mr-2" />
                 Login
               </Link>
-              <p className="text-white/80 text-sm mt-4">
-                Join millions of users worldwide
-              </p>
             </div>
           </div>
         </div>
